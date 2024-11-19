@@ -21,7 +21,7 @@ gantt
     Deploy database           :    d2, after d1, 1d
     Code New interfaces       :    d3, after d2, 4d
     Code Application API      :    dd3a, after d3, 2d
-    Deloy and test on server  :    dd3c, after dd3a, 1d
+    Deploy and test on server  :    dd3c, after dd3a, 1d
     Seurity changes and testing :  d4, after dd3a, 2d
     styling                   :    d6, after dd3a, 4d
     devlopment contingency           :until doccomplete
@@ -61,8 +61,8 @@ erDiagram
     }
     transaction {
         id INT PRIMARY KEY
-        userid INT
-        fundid INT
+        user_id INT
+        fund_id INT
         portfolio_id INT
         volume DECIMAL
         date DATETIME
@@ -107,7 +107,7 @@ flowchart
  l["login"]
     lo["logout"]
     a["about"]
-    r["register"]
+    r["register?"]
     mp["public menu"]
     ua["my account"]
     op["portfolios overview"]
