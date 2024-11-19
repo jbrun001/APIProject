@@ -44,7 +44,7 @@ gantt
 
 
 ## draft data structure
-https://mermaid.js.org/syntax/entityRelationshipDiagram.html
+
 ```mermaid
 ---
 config:
@@ -54,14 +54,20 @@ config:
 erDiagram
     portfolio {
         id INT 
-        userid INT
-        fundid INT
-        last_update DTAETIME
+        user_id INT
+        fund_id INT
+        name NVARCHAR(100)
+        last_update DATETIME
     }
     transaction {
-        id INT
-        userid int
-        fundid int
+        id INT PRIMARY KEY
+        userid INT
+        fundid INT
+        portfolio_id INT
+        volume DECIMAL
+        date DATETIME
+        cost_per_share DECIMAL
+        last_update DATETIME
     }
     fund {
         id INT 
@@ -80,6 +86,7 @@ erDiagram
         id INT
         email NVARCHAR(100)
         pwhash NVARCHAR(200)
+        type NVARCHAR(10)
         last_login DATETIME
     }
 
@@ -89,7 +96,7 @@ erDiagram
 ```
 
 ## draft UI flow
-https://medium.com/undabot/visualizing-use-cases-using-mermaid-js-63a5f1b7d2f
+
 ```mermaid
 ---
 config:
@@ -212,12 +219,14 @@ My application is a stock portfolio reporting system.
 ## Security [500 words max]
 `A description of how you have addressed security risks in your application (max 500 words)`
 
-- Transport SSL
-- Passwords bcrypt , passwords complexity
-- API use (api key?), API rate limiting (denial of service?)
-- SQL Injection attacks – sanitisation
-- Cross Site Scripting – sanitisation
-- Content headers
+Security checklist
+- [ ] Transport SSL
+- [ ] Passwords bcrypt , passwords complexity
+- [ ] API use (api key?), API rate limiting (denial of service?)
+- [ ] SQL Injection attacks – sanitisation
+- [ ] Cross Site Scripting – sanitisation
+- [ ] Content headers
+- [ ] zap test? if time
 
 ## API Usage
 `Details of how to use your API`
