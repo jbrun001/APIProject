@@ -168,12 +168,6 @@ sample data from justetf
 3   IE00B5B5TG76  0.0005  1.70   OSX5   https://finance.yahoo.com/quote/S6X0.DE/            Yes     Yes         EUR
 4   IE00B60SX170  0.0005  4.72   MXUS   https://finance.yahoo.com/quote/MXUS.L/             Yes     Yes         ???
 5   IE00BK5LYT47  0.0005  2.30   MXUD   https://finance.yahoo.com/quote/MXUD.L/             Yes     Yes
-6   IE00B3YCGJ38  0.0005  2.15   SPXS
-7   IE00BYML9W36  0.0005  3.59   SPXD
-8   IE00BJK9H753  0.0005  1.80   BBUS
-9   IE00BJK9H860  0.0005  1.00   BBUD
-10  IE00BFXR5R48  0.0005  1.07   LGUK
-11  IE00BFXR5Q31  0.0005  6.15   LGUS
 ```
 
 
