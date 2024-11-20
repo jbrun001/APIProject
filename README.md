@@ -55,8 +55,8 @@ erDiagram
     portfolios {
         id INT PK 
         user_id INT FK
-        fund_id INT FK
         name VARCHAR(100)
+        value DECIMAL
         last_update DATETIME
     }
     transactions {
@@ -94,7 +94,7 @@ erDiagram
     transactions }|--|| portfolios : "on portfolio_id"
     transactions }|--|| users : "on user_id"
     portfolios }|--|| users : "on user_id"
-    funds }|--|| portfolios : "on fund_id"
+
 ```
 
 ## draft UI flow

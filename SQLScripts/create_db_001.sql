@@ -46,7 +46,6 @@ ALTER TABLE transactions MODIFY id INT AUTO_INCREMENT;
 CREATE TABLE portfolios (
     id INT,
     user_id INT,
-    fund_id INT,
     name VARCHAR(100),
     value DECIMAL(15,2),
     last_update DATETIME, 
