@@ -16,12 +16,11 @@ gantt
     check rubric            :done,  rd5, after rd3, 1d
     test assumptions        :active rd6, after rd5, 5d
 
-    section development
+    section Development
     Deploy base & set up git  :    d1, 2024-11-22,1d
-    Deploy database           :    d2, after d1, 1d
+    Deploy database          :done,    d2, after d1, 1d
     Code New interfaces       :    d3, after d2, 4d
     Code Application API      :    dd3a, after d3, 2d
-    Deploy and test on server  :    dd3c, after dd3a, 1d
     Seurity changes and testing :  d4, after dd3a, 2d
     styling                   :    d6, after dd3a, 4d
     devlopment contingency           :until doccomplete
@@ -35,6 +34,7 @@ gantt
 
     section Critical tasks
     Research & Design                   :crit, after r6, 4h
+    Test deployment on server :crit,    dd3c, after dd3a, 4h
     Development complete                :crit, after d6, 4h
     Final Deployment on Goldsmith servers :crit, after d6, 2d
     Submit                              :milestone, 2024-12-13, 0d
