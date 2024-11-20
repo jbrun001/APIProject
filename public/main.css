@@ -1,0 +1,191 @@
+/* added variables for key elements so can easily change and see what looks better */
+:root {
+  --menu-width: 175px;
+  --menu-collapsed-width: 70px;
+  --header-height: 60px;
+  --background-colour: #007bff;
+  --background-colour-hover: #0056b3; 
+  }
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  height: 100vh;
+  overflow: hidden; /* stops scrolling into header */
+}
+
+/* menu */
+.menu {
+  width: var(--menu-width);
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto; 
+  transition: width 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.menu.collapsed {
+  width: var(--menu-collapsed-width); /* size of menu when collapsed */
+}
+
+/* menu drawer icon */
+.menu-drawer {
+  background-color: var(--background-colour);
+  color: white;
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  padding: 0 10px; 
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: sticky; /* keep at top of page */
+  top: 0;
+  z-index: 10;
+}
+
+.menu-drawer:hover {
+  background-color: var(--background-colour-hover);
+}
+
+.menu-drawer i {
+  font-size: 24px;
+}
+
+/* items in the menu */
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.menu-item i {
+  margin-right: 10px;
+  transition: margin-right 0.3s;
+}
+
+.menu.collapsed .menu-item i {
+  margin-right: 0; /* remove margin when collapsed to save space */
+}
+
+.menu.collapsed .menu-item span {
+  display: none; /* don't show the text when collaped - so just the icon shows */
+}
+
+.menu-item:hover {
+  background-color: #e0e0e0;
+}
+
+/* top of page header for info and logged in user details */
+.header {
+  background-color: var(--background-colour);
+  color: white;
+  height: var(--header-height);
+  line-height: var(--header-height);
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: var(--menu-width); /* start right of the  menu */
+  width: calc(100% - var(--menu-width)); /* fit next to the menu */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s, width 0.3s;
+}
+
+.header-title {
+  font-size: 1.2rem; 
+  font-weight: bold; 
+}
+
+.user-info {
+  font-size: 1rem; 
+  white-space: nowrap; 
+}
+
+.menu.collapsed + .header {  /* + = only applies to header when the previous element is .menu_collapsed */
+  left: var(--menu-collapsed-width); /* header is bigger when menu is collapsed */
+  width: calc(100% - var(--menu-collapsed-width));
+}
+
+/* Content Area */
+.content {
+  position: absolute;
+  top: var(--header-height);                      /* content starts under the header */
+  left: var(--menu-width);                    
+  width: calc(100% - var(--menu-width));      
+  height: calc(100% - var(--header-height));     
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  transition: left 0.3s, width 0.3s;
+}
+
+.menu.collapsed + .header + .content {
+  left: var(--menu-collapsed-width);                    
+  width: calc(100% - var(--menu-collapsed-width));
+}
+.form-container {
+  background: #ffffff;
+  padding: 24px;
+  width: 400px;
+}
+.form-container h1 {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  color: #333;
+}
+.input-field {
+  position: relative;
+  margin-bottom: 24px;
+}
+.input-field input,
+.input-field label {
+  width: 100%;
+}
+.input-field input {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+.input-field input:focus {
+  outline: none;
+  border-color: var(--background-colour);
+}
+.input-field label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  display: block;
+}
+.submit-button {
+  background-color: var(--background-colour);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 16px;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.submit-button:hover {
+  background-color: var(--background-colour-hover);
+}

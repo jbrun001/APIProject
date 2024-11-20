@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <title>Welcome to <%=appData.appName%></title>
+  <link rel="stylesheet"  type="text/css" href="/main.css" />
+</head>
+  <body>
+    <%- include('headerMenu') %>
+      <main class="content">
+        <h2>Here are the available funds:</h2>
+        <ul>
+          <% availableFunds.forEach(function(fund) { %>
+            <li><%= fund.name %>, <%=fund.ticker%> </li>
+          <% }) %>
+        </ul>
+      </main>
+      <%- include('footerMenu') %>
+    </body>
+</html>
