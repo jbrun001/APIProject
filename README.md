@@ -52,47 +52,47 @@ config:
   theme: base
 ---
 erDiagram
-    portfolio {
-        id INT 
-        user_id INT
-        fund_id INT
-        name NVARCHAR(100)
+    portfolios {
+        id INT PK 
+        user_id INT FK
+        fund_id INT FK
+        name VARCHAR(100)
         last_update DATETIME
     }
-    transaction {
-        id INT PRIMARY KEY
-        user_id INT
-        fund_id INT
-        portfolio_id INT
+    transactions {
+        id INT PK
+        user_id INT FK
+        fund_id INT FK
+        portfolio_id INT FK
         volume DECIMAL
         date DATETIME
         cost_per_share DECIMAL
         last_update DATETIME
     }
-    fund {
-        id INT 
-        holder NVARCHAR(MAX)
-        name NVARCHAR(100)
+    funds {
+        id INT PK
+        holder VARCHAR(100)
+        name VARCHAR(100)
         size DECIMAL
         fee DECIMAL
-        distribution NVARCHAR(20)
+        distribution VARCHAR(20)
         holdings DECIMAL
         dividend_yield DECIMAL
-        isin NVARCHAR(15)
-        ticker NVARCHAR(10)
+        isin VARCHAR(15)
+        ticker VARCHAR(10)
         last_updated DATETIME
     }
-    user {
-        id INT
-        email NVARCHAR(100)
-        pwhash NVARCHAR(200)
-        type NVARCHAR(10)
+    users {
+        id INT PK
+        email VARCHAR(100)
+        pwhash VARCHAR(200)
+        type VARCHAR(10)
         last_login DATETIME
     }
 
-    transaction }|--|| fund : transactionid
-    portfolio }|--|| user : userId
-    fund }|--|| portfolio : fundid
+    transactions }|--|| funds : "on transaction_id"
+    portfolios }|--|| users : "on user_id"
+    funds }|--|| portfolios : "on fund_id"
 ```
 
 ## draft UI flow
