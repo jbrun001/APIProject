@@ -9,14 +9,14 @@
 </head>
   <body>
     <%- include('headerMenu') %>
-      <main class="content">
-        <h1>Here are your current portfolios</h2>
-        <ul>
-          <% availablePortfolios.forEach(function(portfolio) { %>
-            <li><%= portfolio.name %>, £<%=portfolio.value%>, £<%=portfolio.user_id%> </li>
-          <% }) %>
-        </ul>
-      </main>
-      <%- include('footerMenu') %>
+    <main class="content">
+      <h1>Here are your current portfolios</h2>
+      <ul>
+        <% availablePortfolios.forEach(function(portfolio) { %>
+          <li><%= portfolio.name %>, Value: £<%=portfolio.value%>, user_id: <%=portfolio.user_id%> portfolio_id: <%=portfolio.id%> </li>
+        <% }) %>
+      </ul>
+    </main>
+    <%- include('footerMenu') %>
     </body>
 </html>
