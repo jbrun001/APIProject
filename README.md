@@ -90,7 +90,9 @@ erDiagram
         last_login DATETIME
     }
 
-    transactions }|--|| funds : "on transaction_id"
+    transactions }|--|| funds : "on fund_id"
+    transactions }|--|| portfolios : "on portfolio_id"
+    transactions }|--|| users : "on user_id"
     portfolios }|--|| users : "on user_id"
     funds }|--|| portfolios : "on fund_id"
 ```
