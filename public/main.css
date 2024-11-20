@@ -87,6 +87,13 @@ body {
   background-color: #e0e0e0;
 }
 
+.menu-link {
+  display: flex;
+  align-items: center; 
+  text-decoration: none; 
+  color: inherit; 
+}
+
 /* top of page header for info and logged in user details */
 .header {
   background-color: var(--background-colour);
