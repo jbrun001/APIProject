@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS portfolios;
 DROP TABLE IF EXISTS transactions;
 
 CREATE TABLE funds (
-    id INT AUTO_INCREMENT,
+    id INT,
     holder VARCHAR(100),
     name VARCHAR(100),
     size DECIMAL(15, 2),
@@ -26,8 +26,10 @@ CREATE TABLE funds (
     PRIMARY KEY(id)
 );
 
+ALTER TABLE funds MODIFY id INT AUTO_INCREMENT;
+
 CREATE TABLE transactions (
-    id INT AUTO_INCREMENT,
+    id INT,
     user_id INT,
     fund_id INT,
     portfolio_id INT,
@@ -38,8 +40,11 @@ CREATE TABLE transactions (
     PRIMARY KEY(id)
 );
 
+ALTER TABLE transactions MODIFY id INT AUTO_INCREMENT;
+
+
 CREATE TABLE portfolios (
-    id INT AUTO_INCREMENT,
+    id INT,
     user_id INT,
     fund_id INT,
     name VARCHAR(100),
@@ -48,13 +53,19 @@ CREATE TABLE portfolios (
     PRIMARY KEY(id)
 );
 
+ALTER TABLE portfolios MODIFY id INT AUTO_INCREMENT;
+
 CREATE TABLE users (
-    id INT PRIMARY KEY,
+    id INT,
     email VARCHAR(100),
     type VARCHAR(10),
     pwhash VARCHAR(200),
-    last_login DATETIME 
+    last_login DATETIME,
+    PRIMARY KEY(id) 
 );
+
+ALTER TABLE users MODIFY id INT AUTO_INCREMENT;
+
 
 USE portfolio;
 DROP USER IF EXISTS 'portfolio_app'@'localhost';

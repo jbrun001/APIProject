@@ -80,3 +80,4 @@ Memory: minimum 512MB (for O/S and just this application running)
 
 # demo system login credentials and roles
 
+customer: `jake@123.com testing1@`
