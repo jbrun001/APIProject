@@ -48,11 +48,11 @@ use nano to create .env file (contains security details so not synced with git)
 
 `sudo apt install -g forever`
 
-`forever start app.js`
+`forever start index.js`
 
 to stop the application
 
-`forever stop app.js`
+`forever stop index.js`
 
 # hardware and software requirements
 
