@@ -14,16 +14,16 @@ gantt
     Database design & script  :done,    rd3d, after rd2, 2d
     security checklist      :done,  rd4, after rd3, 1d
     check rubric            :done,  rd5, after rd3, 1d
-    test assumptions        :active rd6, after rd5, 5d
+    test assumptions        :done, rd6, after rd5, 5d
 
     section Development
-    Deploy base & set up git  :    d1, 2024-11-22,1d
+    Deploy base & set up git  :active,    d1, 2024-11-22,1d
     Deploy database          :done,    d2, after d1, 1d
     Code New interfaces       :    d3, after d2, 4d
     Code Application API      :    dd3a, after d3, 2d
     Seurity changes and testing :  d4, after dd3a, 2d
     styling                   :    d6, after dd3a, 4d
-    devlopment contingency           :until doccomplete
+    development contingency           :until doccomplete
 
     section Documentation
     start documentation :done,    d0, 2024-11-07,2024-11-08   
