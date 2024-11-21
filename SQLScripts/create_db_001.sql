@@ -35,7 +35,7 @@ CREATE TABLE transactions (
     portfolio_id INT,
     volume DECIMAL(15,2),
     transaction_date DATETIME,
-    cost_per_share DECIMAL(10,5),
+    share_price DECIMAL(10,5),
     last_update DATETIME,
     PRIMARY KEY(id)
 );

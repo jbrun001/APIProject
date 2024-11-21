@@ -66,7 +66,7 @@ erDiagram
         portfolio_id INT FK
         volume DECIMAL
         date DATETIME
-        cost_per_share DECIMAL
+        share_price DECIMAL
         last_update DATETIME
     }
     funds {
@@ -97,7 +97,7 @@ erDiagram
 
 ```
 
-## draft UI flow
+## draft UI flow v1.0
 
 ```mermaid
 ---
@@ -106,55 +106,49 @@ config:
   theme: base
 ---
 flowchart
- l["login"]
-    lo["logout"]
-    a["about"]
-    r["register?"]
-    mp["public menu"]
-    ua["my account"]
-    op["portfolios overview"]
-    vp["portfolio view"]
-    vt["transactions view"]
-    i["index"]
-    mu["+user menu"]
-    ma["+admin menu"]
-    ef["crud funds"]
-    eu["crud users"]
-    ad["api docs"]
     api["public api url"]
-    ff[["filter funds"]]
-    fu[["filter users"]]
-    fp[["filter portfolios"]]
-    ma-->fu
-    fu-->eu
-    eu-->fu
-    ma-->ff
-    ff-->ef
-    ef-->ff
-    mp-->l
-    mp-->r
-    mp-->a
-    mp-->ad
+    i["index"]-->menu
+    login["login"]
+ 
+    menu["menu"]
+    menu-->login
 
-    i-->mp  
-    i-->a
+    portfoliolist["my portfolios"]
+    portfolioadd["add"]
+    portfoliodelete[["delete"]]
+    menu-->portfoliolist
+    portfoliolist-->portfolioadd
+    portfolioadd-->portfoliolist
+    portfoliolist-->portfoliodelete
+    portfoliodelete-->portfoliolist
+    portfoliolist-->fundslist
+    about["help (about)"]
+    fundslist["my funds"]
+    fundview["view fund"]
+    fundtransactions[["transactions"]]
+    fundsummary[["summary"]]
+    filterfunds[["find funds"]]
+    transactionadd["add transaction"]
+    fundslist-->filterfunds
+    filterfunds-->transactionadd
+    transactionadd-->fundslist
+    fundslist-->fundview
+    fundslist-->transactionadd
+    fundview-->transactionadd
+    fundview-->fundsummary
+    fundview-->fundtransactions
+    transactionadd-->fundview
+    settings["settings"]
+    menu-->settings
+    menu-->about
+    logout["logout"]
+    menu-->logout
+    adminuser["user admin"]
+    adminfunds["fund admin"]
+    settings-->adminuser
+    settings-->adminfunds
 
-    mu-->ua
-    mu-->op
-    mu-->lo
-
-    op-->vp
-    vp-->ff
-    op-->ep
-    vp-->vt
-	
     
-
-
-    l-->op
-    l-->mu
-    l-->ma
- ep[["crud portfolio"]]
 ```
 
 
