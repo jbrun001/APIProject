@@ -22,26 +22,22 @@ router.get('/list', redirectLogin,function(req, res, next) {
 })
 
 
-router.get('/add', redirectLogin, function (req, res, next) {
-    if (req.session.userType == 'admin')
-    {
-        res.render("transactionsAdd.ejs")
-    }else{
-        res.send('You do not have permissions to add a transaction. <a href='+'/'+'>Home</a>')
-    }
+router.post('/add', redirectLogin, function (req, res, next) {
+    res.render("transactionsAdd.ejs",{fund_id:req.body.fund_id, portfolio_id:req.body.portfolio_id})
 })
+
 
 router.post('/added', redirectLogin,function (req, res, next) {
     // saving data in database
-    let sqlquery = "INSERT INTO transactions (name, price) VALUES (?,?)"
+    let sqlquery = "INSERT INTO transactions (user_id, fund_id, portfolio_id, volume, share_price) VALUES (?,?,?,?,?)"
     // execute sql query
-    let newrecord = [req.body.name, req.body.price]
+    let newrecord = [req.session.userId, req.body.fund_id, req.body.portfolio_id, req.body.volume, req.body.share_price]
     db.query(sqlquery, newrecord, (err, result) => {
         if (err) {
             next(err)
         }
         else
-            res.send(' This transaction is added to database, name: '+ req.body.name)
+            res.render("/funds/list",{portfolio_id:req.body.portfolio_id});
     })
 }) 
 

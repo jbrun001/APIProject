@@ -44,7 +44,7 @@ use nano to create .env file (contains security details so not synced with git)
 
 `mysql> quit`
 
-`npm install dotenv mysql2 express express-session ejs bcrypt`
+`npm install dotenv mysql2 express express-session ejs bcrypt express-validator`
 
 `sudo apt install -g forever`
 

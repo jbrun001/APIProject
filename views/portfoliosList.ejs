@@ -10,12 +10,36 @@
   <body>
     <%- include('headerMenu') %>
     <main class="content">
-      <h1>Here are your current portfolios</h2>
-      <ul>
+      <div class="main">
+        <h1>My Portfolios</h1>
+        <ul class="item-list">
         <% availablePortfolios.forEach(function(portfolio) { %>
-          <li><%= portfolio.name %>, Value: £<%=portfolio.value%>, user_id: <%=portfolio.user_id%> portfolio_id: <%=portfolio.id%> </li>
+          <li class="item">
+            <div class="item-icon">
+              <i class="material-icons">pie_chart</i>
+            </div>
+            <div class="item-content">
+              <span class="item-name"><%= portfolio.name %> (#<%=portfolio.id%>)</span>
+              <span class="item-value">£<%=portfolio.value%></span>
+            </div>
+            <div class="item-actions">
+              <form action="/funds/list" method="POST">
+                <input type="hidden" name="portfolio_id" value="<%=portfolio.id%>"> 
+                <button type="submit" class="delete-btn">Edit</button>
+              </form>
+              <form action="/remove" method="POST">
+                <input type="hidden" name="portfolio_id" value="<%=portfolio.id%>"> 
+                <button type="submit" class="delete-btn">Remove</button>
+              </form>
+            </div>
+          </li>
         <% }) %>
-      </ul>
+        </ul>
+        <a href="add" class="fab" id="fab-add">
+          <i class="material-icons">add</i>
+        </a>
+      
+      </div>
     </main>
     <%- include('footerMenu') %>
     </body>

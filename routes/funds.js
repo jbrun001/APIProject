@@ -1,5 +1,7 @@
 const express = require("express")
 const router = express.Router()
+const { body, validationResult } = require('express-validator');
+
 // get the start of the URL from index.js
 const { ORIGIN_URL } = require('../index.js');
 const redirectLogin = (req, res, next) => {
@@ -27,14 +29,30 @@ router.get('/search_result',redirectLogin, function (req, res, next) {
 })
 
 
-router.get('/list',redirectLogin, function(req, res, next) {
-    let sqlquery = "SELECT * FROM funds where portfolio_id = 1" 
+router.post(
+    '/list',
+    redirectLogin,
+    [body('portfolio_id').isInt().withMessage('portfolio must be an integer')], 
+    function(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    // group transactions to get list of funds in this portfolio
+    let sqlquery = `SELECT transactions.fund_id, funds.ticker, funds.name, 
+                    	SUM(transactions.volume * transactions.share_price) AS total_cost, 
+                        SUM(transactions.volume) AS total_shares,
+                        MAX(transactions.transaction_date) AS last_transaction
+                    FROM transactions JOIN funds ON transactions.fund_id = funds.id 
+                    WHERE transactions.user_id = ? AND transactions.portfolio_id = ?
+                    GROUP BY transactions.fund_id, funds.name 
+                    ORDER BY funds.name;` 
     // execute sql query
-    db.query(sqlquery, (err, result) => {
+    db.query(sqlquery,[req.body.portfolio_id,req.session.userId,req.body.portfolio_id], (err, result) => {
         if (err) {
             next(err)
         }
-        res.render("fundsList.ejs", {selectedFunds:result})
+        res.render("fundsList.ejs", {portfolio_id:req.body.portfolio_id, funds:result})
      })
 })
 

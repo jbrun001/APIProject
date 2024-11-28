@@ -17,10 +17,10 @@ gantt
     test assumptions        :done, rd6, after rd5, 5d
 
     section Development
-    Deploy base & set up git  :active,    d1, 2024-11-22,1d
+    Deploy base & set up git  :done,    d1, 2024-11-22,1d
     Deploy database          :done,    d2, after d1, 1d
-    Code New interfaces       :    d3, after d2, 4d
-    Code Application API      :    dd3a, after d3, 2d
+    Code New interfaces       :done,    d3, after d2, 4d
+    Code Application API      :active,    dd3a, after d3, 2d
     Seurity changes and testing :  d4, after dd3a, 2d
     styling                   :    d6, after dd3a, 4d
     development contingency           :until doccomplete
@@ -33,7 +33,7 @@ gantt
     Documentation complete              :milestone, doccomplete, 2024-12-11, 0d
 
     section Critical tasks
-    Research & Design                   :crit, after r6, 4h
+    Research & Design                   :crit, after d1, 4h
     Test deployment on server :crit,    dd3c, after dd3a, 4h
     Development complete                :crit, after d6, 4h
     Final Deployment on Goldsmith servers :crit, after d6, 2d

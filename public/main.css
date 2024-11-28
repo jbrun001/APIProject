@@ -4,7 +4,8 @@
   --menu-collapsed-width: 70px;
   --header-height: 60px;
   --background-colour: #007bff;
-  --background-colour-hover: #0056b3; 
+  --background-colour-hover: #0056b3;
+  --item-hover: #e0e0e0;
   }
 
 body {
@@ -84,7 +85,7 @@ body {
 }
 
 .menu-item:hover {
-  background-color: #e0e0e0;
+  background-color: var(--item-hover);
 }
 
 .menu-link {
@@ -195,4 +196,108 @@ body {
 }
 .submit-button:hover {
   background-color: var(--background-colour-hover);
+}
+
+/* styles for list of portfolios/funds/transactions to be used in the xxxList ejs's */
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #f9f9f9;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+.item:hover {
+  background-color: var(--item-hover);
+}
+
+.item-icon {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  color: #007bff;
+  margin-right: 15px;
+}
+
+.item-content {
+  flex-grow: 1;
+}
+
+.item-name {
+  display: block;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.item-value {
+  display: block;
+  font-size: 0.9rem;
+  color: gray;
+}
+
+.item-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.delete-btn, .add-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.delete-btn:hover, .add-btn:hover {
+  background-color: #0056b3;
+}
+.add-btn {
+  margin-top: 20px;
+  display: block;
+}
+/* floating action button - add */
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  z-index: 1000;
+}
+
+.fab:hover {
+  background-color: #0056b3;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+.fab i {
+  font-size: 24px;
 }
