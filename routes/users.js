@@ -3,9 +3,11 @@ const express = require("express")
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const saltRounds = 10
+// get the start of the URL from index.js
+const { ORIGIN_URL } = require('../index.js');
 const redirectLogin = (req, res, next) => {
-    if (!req.session.userId ) {
-        res.redirect('users/login') // redirect to the login page
+    if (!req.session.userId ) {       
+        res.redirect(ORIGIN_URL+'/users/login') // redirect to the login page
     } else { 
         next (); // move to the next middleware function
     } 

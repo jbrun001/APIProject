@@ -1,13 +1,14 @@
 const express = require("express")
 const router = express.Router()
+// get the start of the URL from index.js
+const { ORIGIN_URL } = require('../index.js');
 const redirectLogin = (req, res, next) => {
-    if (!req.session.userId ) {
-        res.redirect('users/login') // redirect to the login page
+    if (!req.session.userId ) {       
+        res.redirect(ORIGIN_URL+'/users/login') // redirect to the login page
     } else { 
         next (); // move to the next middleware function
     } 
 }
-
 
 router.get('/list', redirectLogin,function(req, res, next) {
     let sqlquery = "SELECT * FROM portfolios where user_id = " + req.session.userId 
