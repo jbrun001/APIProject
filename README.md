@@ -20,7 +20,8 @@ gantt
     Deploy base & set up git  :done,    d1, 2024-11-22,1d
     Deploy database          :done,    d2, after d1, 1d
     Code New interfaces       :done,    d3, after d2, 4d
-    Code Application API      :active,    dd3a, after d3, 2d
+    Project delay (Focus on FYP) :done,    delay1, after d3, 9d
+    Code Application API      :active,    dd3a, after delay1, 6d
     Seurity changes and testing :  d4, after dd3a, 2d
     styling                   :    d6, after dd3a, 4d
     development contingency           :until doccomplete
@@ -30,14 +31,14 @@ gantt
     draft documentation in mark down  :until finaldoc
     start final doc            :finaldoc, after d6, 4h
     final documentation :until doccomplete 
-    Documentation complete              :milestone, doccomplete, 2024-12-11, 0d
+    Documentation complete              :milestone, doccomplete, 2025-01-06, 0d
 
     section Critical tasks
     Research & Design                   :crit, after d1, 4h
     Test deployment on server :crit,    dd3c, after dd3a, 4h
     Development complete                :crit, after d6, 4h
     Final Deployment on Goldsmith servers :crit, after d6, 2d
-    Submit                              :milestone, 2024-12-13, 0d
+    Submit                              :milestone, 2025-01-13, 0d
 
 
 ```

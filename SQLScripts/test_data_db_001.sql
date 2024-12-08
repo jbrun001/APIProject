@@ -1,21 +1,13 @@
-insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) 
-				  values (1, 1, 49, 1,1000,'2024-11-24 11:50:14', 25,'2024-11-24 11:50:14');
-insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) 
-				  values (2, 1, 49, 1,-100,'2024-11-24 11:50:14', 70,'2024-11-24 11:50:14');
-insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) 
-				  values (3, 1, 49, 1,-1,'2024-11-24 11:50:14', 75,'2024-11-24 11:50:14');
+insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) values (1, 1, 49, 1,1000,'2024-11-24 11:50:14', 25,'2024-11-24 11:50:14');
+insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) values (2, 1, 49, 1,-100,'2024-11-24 11:50:14', 70,'2024-11-24 11:50:14');
+insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) values (3, 1, 49, 1,-1,'2024-11-24 11:50:14', 75,'2024-11-24 11:50:14');
 
-insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) 
-				  values (4, 1, 50, 1,5000,'2024-11-24 11:50:14', 104,'2024-11-24 11:50:14');
-insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) 
-				  values (5, 1, 50, 1,-100,'2024-11-24 11:50:14', 106.34,'2024-11-24 11:50:14');
-insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) 
-				  values (6, 1, 50, 1,-1000,'2024-11-24 11:50:14', 103.23,'2024-11-24 11:50:14');
+insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) values (4, 1, 50, 1,5000,'2024-11-24 11:50:14', 104,'2024-11-24 11:50:14');
+insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) values (5, 1, 50, 1,-100,'2024-11-24 11:50:14', 106.34,'2024-11-24 11:50:14');
+insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) values (6, 1, 50, 1,-1000,'2024-11-24 11:50:14', 103.23,'2024-11-24 11:50:14');
 
-insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) 
-				  values (7, 1, 51, 1,750,'2024-11-24 11:50:14', 54,'2024-11-24 11:50:14');
-insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) 
-				  values (8, 1, 51, 1,250,'2024-11-24 11:50:14', 60,'2024-11-24 11:50:14');
+insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) values (7, 1, 51, 1,750,'2024-11-24 11:50:14', 54,'2024-11-24 11:50:14');
+insert into transactions (id, user_id, fund_id, portfolio_id, volume, transaction_date, share_price, last_update) values (8, 1, 51, 1,250,'2024-11-24 11:50:14', 60,'2024-11-24 11:50:14');
 
 INSERT INTO funds (id, holder, name, size, fee, distribution, holdings, dividend_yield, isin, ticker, last_update) VALUES (49, '', 'Vanguard FTSE 250 UCITS ETF (GBP) Accumulating', 755000000.0, 0.001, 'Accumulating', 252.0, NULL, 'IE00BFMXVQ44', 'VMIG', '2024-11-15 11:50:14');
 INSERT INTO funds (id, holder, name, size, fee, distribution, holdings, dividend_yield, isin, ticker, last_update) VALUES (50, '', 'Vanguard FTSE 250 UCITS ETF Distributing', 2035000000.0, 0.001, 'Distributing', 252.0, 0.036699999999999997, 'IE00BKX55Q28', 'VMID', '2024-11-15 11:50:14');

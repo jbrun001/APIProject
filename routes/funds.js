@@ -24,7 +24,7 @@ router.get('/search_result',redirectLogin, function (req, res, next) {
         if (err) {
             next(err)
         }
-        res.render("fundsList.ejs", {availableFunds:result})
+        res.render("fundsList.ejs", {Funds:result})
      }) 
 })
 
