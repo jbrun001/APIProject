@@ -38,7 +38,7 @@ gantt
     Test deployment on server :crit,    dd3c, after dd3a, 4h
     Development complete                :crit, after d6, 4h
     Final Deployment on Goldsmith servers :crit, after d6, 2d
-    Submit                              :milestone, 2025-01-13, 0d
+    Submit                              :milestone, 2025-01-08, 0d
 
 
 ```
