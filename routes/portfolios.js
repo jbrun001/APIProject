@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const { validateAndSanitiseUsers } = require('../middleware/validateAndSanitiseInput');
+const { validateAndSanitisePortfolios } = require('../middleware/validateAndSanitiseInput');
 
 // get the start of the URL from index.js
 const { ORIGIN_URL } = require('../index.js');
@@ -25,26 +25,40 @@ router.get('/list', redirectLogin,function(req, res, next) {
 
 
 router.get('/add', redirectLogin, function (req, res, next) {
-    if (req.session.userType == 'admin' || req.session.userType == 'customer')
-    {
-        res.render("portfoliosAdd.ejs")
-    }else{
+    if (req.session.userType == 'admin' || req.session.userType == 'customer') {
+        res.render("portfoliosAdd.ejs", {
+            previousData: {}, // empty object for data previously entered
+            messages: [],     // array for validation messages
+        });
+    } else{
         res.send('You do not have permissions to add a portfolio. <a href='+'/'+'>Home</a>')
     }
 })
 
-router.post('/added', redirectLogin,function (req, res, next) {
+router.post('/added', validateAndSanitisePortfolios, redirectLogin,function (req, res, next) {
     // saving this portfolio for this user in the database
-    let sqlquery = "INSERT INTO portfolios (name, user_id) VALUES (?,?)"
-    // execute sql query
-    let newrecord = [req.sanitize(req.body.name), req.session.userId]
-    db.query(sqlquery, newrecord, (err, result) => {
-        if (err) {
-            next(err)
-        }
-        else
-            res.redirect("/portfolios/list")  // if successful list all the portfolios 
-    })
+    if (req.validationErrors) {
+        // debug to test data is there
+        console.log({ success: false, previousData: req.body, messages: req.validationErrors });
+        // if there are errors then send the old data and the messages to the form
+        // so they can be displayed
+        return res.render('portfoliosAdd.ejs', {
+            previousData: req.body,
+            messages: req.validationErrors,
+        });
+    }
+    else {
+        let sqlquery = "INSERT INTO portfolios (name, user_id) VALUES (?,?)"
+        // execute sql query
+        let newrecord = [req.body.name, req.session.userId]
+        db.query(sqlquery, newrecord, (err, result) => {
+            if (err) {
+                next(err)
+            }
+            else
+                res.redirect("/portfolios/list")  // if successful list all the portfolios 
+        })
+    }
 }) 
 
 

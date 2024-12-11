@@ -2,7 +2,7 @@ const express = require("express")
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt')
 const router = express.Router()
-const { validateAndSanitiseUsers } = require('../middleware/validateAndSanitiseInput');
+const { validateAndSanitiseFunds } = require('../middleware/validateAndSanitiseInput');
 
 // get the start of the URL from index.js
 const { ORIGIN_URL } = require('../index.js');
@@ -34,8 +34,7 @@ router.get('/search_result',redirectLogin, function (req, res, next) {
 
 router.post(
     '/list',
-    redirectLogin,
-    [body('portfolio_id').isInt().withMessage('portfolio must be an integer')], 
+    validateAndSanitiseFunds,redirectLogin,
     function(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
