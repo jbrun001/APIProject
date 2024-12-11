@@ -20,9 +20,13 @@ const validateAndSanitiseFunds = [
     query('search_text')
         .optional()
         .isLength({ min: 3 })
-        .withMessage('Search text must be greater than 3 character.')
+        .withMessage('Search text must be greater than 3 characters')
         .trim(),
-
+    query('sort_by')
+        .optional()
+        .isIn(['size', 'fee', 'dividend_yield'])
+        .withMessage('Incorrect sorting request. Please use sorting options in the dropdown.')
+        .trim(),
     sanitiseInputs,
     (req, res, next) => {
         // validate and build an array of fields that failed validation and why they failed

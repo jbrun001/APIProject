@@ -11,9 +11,9 @@
     <%- include('headerMenu') %>
       <main class="content">
         <h1>Search <%=appData.appName%> funds</h1>
-        <form action="search_result" method="GET">
-          <p>What fund do you want?</p>
-          <input id="search_box" type="text" name="search_text">
+        <form action="search-result" method="GET">
+          <p>Search for a fund by name or part of name?</p>
+          <input id="search_text" type="text" name="search_text">
           <input type="submit" value="Search" >
         </form>
       </main>

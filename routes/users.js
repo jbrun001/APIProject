@@ -111,7 +111,7 @@ router.post('/loggedin', function(req, res, next) {
                     req.session.userEmail = dbresult[0].email;
                     req.session.userId = dbresult[0].id;
                     req.session.userType = dbresult[0].type;
-                    res.send(' Username and password matches!! <a href='+'/'+'>Home</a>')
+                    res.redirect("/") // redirect to the home page with the links on it
                 }
                 else {
                     res.render('login.ejs', {userInstruction})  

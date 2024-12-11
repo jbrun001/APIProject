@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" type="text/css" href="/main.css" />
+        <title>Welcome to <%= appData.appName %></title>
+    </head>
+    <body>
+        <%- include('headerMenu') %>
+        <main class="content">
+            <div class="main">
+                <h1>Fund Library Search Results</h1>
+
+                <!-- Filter and Sort Options -->
+                <div class="filters">
+                    <form action="/funds/search-result" method="GET">
+                        <input type="text" name="search_text" placeholder="Search funds..." value="<%= previousData.search_text %>">
+                        <select name="sort_by">
+                            <option value="size">Size</option>
+                            <option value="fee">Fee</option>
+                            <option value="dividend_yield">Dividend Yield</option>
+                        </select>
+                        <button type="submit" class="search-btn">Search</button>
+                        <!-- validation errors -->
+                        <% if (messages.length > 0) { %>
+                        <ul>
+                            <% messages.forEach(function(error) { %>
+                            <li><%= error.message %></li>
+                            <% }); %>
+                        </ul>
+                        <% } %>
+                     </form>
+                </div>
+                <!-- results Table -->
+                <table class="funds-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Ticker</th>
+                            <th>Size</th>
+                            <th>Fee (%)</th>
+                            <th>Dividend Yield (%)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% funds.forEach(function(fund) { %>
+                            <tr>
+                                <td><%= fund.name %></td>
+                                <td><%= fund.ticker %></td>
+                                <td><%= fund.size.toLocaleString() %></td>
+                                <td><%= fund.fee %></td>
+                                <td><%= fund.dividend_yield %></td>
+                                <td>
+                                  <button class="details-btn" onclick="toggleDetails('<%= fund.isin %>')">Details</button>
+                                  <form action="/transactions/add" method="POST" style="display: inline;">
+                                    <input type="hidden" name="fund_id" value="<%= fund.fund_id %>">
+                                    <input type="hidden" name="fund_name" value="<%= fund.name %> (<%= fund.ticker %>)">
+                                    <button type="submit" class="add-btn">Buy</button>
+                                  </form>
+                                </td>
+                            </tr>
+                            <tr class="details-row" id="details-<%= fund.isin %>" style="display: none;">
+                                <td colspan="6">
+                                    <div>
+                                        <strong>ISIN:</strong> <%= fund.isin %> <br>
+                                        <strong>Distribution:</strong> <%= fund.distribution %> <br>
+                                        <strong>Holdings:</strong> <%= fund.holdings.toLocaleString() %> <br>
+                                        <strong>Last Update:</strong> <%= fund.last_update.toISOString().split('T')[0] %>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        <%- include('footerMenu') %>
+        <script>
+              function toggleDetails(isin) {
+                  const detailsRow = document.getElementById(`details-${isin}`);
+                  if (detailsRow.style.display === "none") {
+                      detailsRow.style.display = "table-row";
+                  } else {
+                      detailsRow.style.display = "none";
+                  }
+              }
+        </script>
+    </body>
+</html>

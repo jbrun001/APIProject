@@ -39,7 +39,7 @@ router.post('/added', validateAndSanitisePortfolios, redirectLogin,function (req
     // saving this portfolio for this user in the database
     if (req.validationErrors) {
         // debug to test data is there
-        console.log({ success: false, previousData: req.body, messages: req.validationErrors });
+        //console.log({ success: false, previousData: req.body, messages: req.validationErrors });
         // if there are errors then send the old data and the messages to the form
         // so they can be displayed
         return res.render('portfoliosAdd.ejs', {

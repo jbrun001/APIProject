@@ -265,13 +265,14 @@ h1 {
   transition: background-color 0.2s ease;
 }
 
-.delete-btn:hover, .add-btn:hover {
+.delete-btn:hover, .add-btn:hover, .search-btn:hover {
   background-color: #0056b3;
 }
-.add-btn {
+.add-btn, .search-btn, .details-btn {
   margin-top: 20px;
   display: block;
 }
+
 /* floating action button - add */
 .fab {
   position: fixed;

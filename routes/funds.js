@@ -15,20 +15,48 @@ const redirectLogin = (req, res, next) => {
 }
 
 router.get('/search',redirectLogin,function(req, res, next){
-    res.render("fundsSearch.ejs")
+    res.render("fundsSearch.ejs",{
+        previousData: {}, // empty object for data previously entered
+        messages: [],     // array for validation messages
+    });
 })
 
-router.get('/search_result',redirectLogin, function (req, res, next) {
-    // Search the database
-    let sqlquery = "SELECT * FROM funds WHERE name LIKE ?"
-    const searchText = '%' + req.query.search_text + '%';
-    // execute sql query
-    db.query(sqlquery,[searchText], (err, result) => {
-        if (err) {
-            next(err)
+router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (req, res, next) {
+    // Search the list of available funds
+    if (req.validationErrors) {
+        // debug to test data is there
+        console.log({ success: false, previousData: req.query, messages: req.validationErrors });
+        // if there are errors then send the old data and the messages to the form
+        // so they can be displayed
+        return res.render('fundsSearchResults.ejs', {
+            previousData: req.query,
+            messages: req.validationErrors,
+            funds: [],   // if there are errors don't display any funds
+        });
+    }
+    else {
+        // if there is a sorting parameter then order by that
+        let order = ' ORDER BY NAME ASC'
+        if (req.query.sort_by) {
+            order = ' ORDER BY ' + req.query.sort_by + ' ASC'
         }
-        res.render("fundsList.ejs", {Funds:result})
-     }) 
+        let sqlquery = "SELECT * FROM funds WHERE name LIKE ?" + order
+        const searchText = '%' + req.query.search_text + '%';
+        // execute sql query
+        console.log(sqlquery)
+        db.query(sqlquery,[searchText], (err, result) => {
+            if (err) {
+                next(err)
+            }
+            res.render("fundsSearchResults.ejs", 
+                {
+                    funds:result,
+                    previousData: req.query,
+                    messages: [],  // if code here then it's successful and messages is empty
+                }
+            )
+        })
+    } 
 })
 
 
