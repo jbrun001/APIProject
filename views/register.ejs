@@ -14,7 +14,7 @@
           <h1>Register for <%=appData.appName%></h1>
           <form id="loginForm" method="POST" action="/users/registered">
             <div class="input-field <%= messages.some(error => error.field === 'email') ? 'error-field' : '' %>">
-              <label for="name">Email:</label>
+              <label for="email">Email:</label>
               <input type="email" id="email" name="email" value="<%= previousData.email || '' %>" maxlength="60" required>
             </div>
             <div class="input-field <%= messages.some(error => error.field === 'password') ? 'error-field' : '' %>">

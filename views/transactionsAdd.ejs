@@ -1,31 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <title>Welcome to <%=appData.appName%></title>
-  <link rel="stylesheet"  type="text/css" href="/main.css" />
-</head>
-  <body>
-    <%- include('headerMenu') %>
-      <main class="content">
-        <div class="form-container">
-          <h1>Add Transaction to ***** FUNDNAME *****</h1>
-          <form id="addTransactionForm" method="POST" action="/transactions/added">
-            <div class="input-field">
-                <input type="hidden" name="portfolio_id" value="<%=portfolio_id%>">
-                <input type="hidden" name="fund_id" value="<%=fund_id%>">
-                <label for="volume">Number of shares:</label>
-                <input type="number" id="volume" name="volume" maxlength="15" required>
-                <label for="share_price">Share Price:</label>
-                <input type="number" id="share_price" name="share_price" maxlength="15" required>
-              </div>
-            <button type="submit" class="submit-button">Add Transaction</button>
-          </form>
-        </div>
-      </main>
-    <%- include('footerMenu') %>
-  </body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <title>Welcome to <%=appData.appName%></title>
+        <link rel="stylesheet"  type="text/css" href="/main.css" />
+    </head>
+    <body>
+        <%- include('headerMenu') %>
+        <main class="content">
+            <div class="form-container">
+            <h1>Add Transaction to <%=fund_name%> </h1>
+            <form id="addTransactionForm" method="POST" action="/transactions/added">
+                <div class="input-field">
+                    <input type="hidden" name="portfolio_id" value="<%=portfolio_id%>">
+                    <input type="hidden" name="fund_id" value="<%=fund_id%>">
+                    <input type="hidden" name="fund_name" value="<%=fund_name%>">
+                </div>
+                <div class="input-field <%= messages.some(error => error.field === 'volume') ? 'error-field' : '' %>">
+                    <label for="volume">Number of shares:</label>
+                    <input type="number" step="any" id="volume" name="volume" value="<%= previousData.volume || '' %>" required>
+                </div>
+                <div class="input-field <%= messages.some(error => error.field === 'share_price') ? 'error-field' : '' %>">
+                    <label for="share_price">Share Price:</label>
+                    <input type="number" step="any" id="share_price" name="share_price" value="<%= previousData.share_price || '' %>" required>
+                </div>
+                <button type="submit" class="submit-button">Add Transaction</button>
+                <% if (messages.length > 0) { %>
+                    <ul>
+                        <% messages.forEach(function(error) { %>
+                            <li><%= error.message %></li>
+                        <% }); %>
+                    </ul>
+                <% } %>
+            </form>
+            </div>
+        </main>
+        <%- include('footerMenu') %>
+    </body>
 </html>
 
