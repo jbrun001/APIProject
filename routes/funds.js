@@ -1,6 +1,7 @@
 const express = require("express")
-const router = express.Router()
 const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcrypt')
+const router = express.Router()
 
 // get the start of the URL from index.js
 const { ORIGIN_URL } = require('../index.js');
@@ -18,7 +19,7 @@ router.get('/search',redirectLogin,function(req, res, next){
 
 router.get('/search_result',redirectLogin, function (req, res, next) {
     // Search the database
-    let sqlquery = "SELECT * FROM funds WHERE name LIKE '%" + req.query.search_text + "%'" 
+    let sqlquery = "SELECT * FROM funds WHERE name LIKE '%" + req.sanitize(req.query.search_text) + "%'"
     // execute sql query
     db.query(sqlquery, (err, result) => {
         if (err) {
@@ -48,11 +49,11 @@ router.post(
                     GROUP BY transactions.fund_id, funds.name 
                     ORDER BY funds.name;` 
     // execute sql query
-    db.query(sqlquery,[req.body.portfolio_id,req.session.userId,req.body.portfolio_id], (err, result) => {
+    db.query(sqlquery,[req.sanitize(req.body.portfolio_id), req.session.userId, req.sanitize(req.body.portfolio_id)], (err, result) => {
         if (err) {
             next(err)
         }
-        res.render("fundsList.ejs", {portfolio_id:req.body.portfolio_id, funds:result})
+        res.render("fundsList.ejs", {portfolio_id:req.sanitize(req.body.portfolio_id), funds:result})
      })
 })
 
@@ -69,16 +70,18 @@ router.get('/add', redirectLogin, function (req, res, next) {
 })
 
 router.post('/added',redirectLogin, function (req, res, next) {
+    fundName = req.sanitize(req.body.name)
+    fundPrice = req.sanitize(req.body.price)
     // saving data in database
     let sqlquery = "INSERT INTO funds (name, price) VALUES (?,?)"
     // execute sql query
-    let newrecord = [req.body.name, req.body.price]
+    let newrecord = [fundName, fundPrice]
     db.query(sqlquery, newrecord, (err, result) => {
         if (err) {
             next(err)
         }
         else
-            res.send(' This fund was added to database, name: '+ req.body.name + ' price '+ req.body.price)
+            res.send(' This fund was added to database, name: '+ fundName + ' price '+ fundPrice)
     })
 }) 
 

@@ -35,7 +35,7 @@ router.post('/added', redirectLogin,function (req, res, next) {
     // saving this portfolio for this user in the database
     let sqlquery = "INSERT INTO portfolios (name, user_id) VALUES (?,?)"
     // execute sql query
-    let newrecord = [req.body.name, req.session.userId]
+    let newrecord = [req.sanitize(req.body.name), req.session.userId]
     db.query(sqlquery, newrecord, (err, result) => {
         if (err) {
             next(err)

@@ -1,8 +1,9 @@
 // Create a new router
 const express = require("express")
-const router = express.Router()
+const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt')
 const saltRounds = 10
+const router = express.Router()
 // get the start of the URL from index.js
 const { ORIGIN_URL } = require('../index.js');
 const redirectLogin = (req, res, next) => {
@@ -17,24 +18,29 @@ router.get('/register', function (req, res, next) {
     res.render('register.ejs')                                                               
 })    
 
-router.post('/registered', function (req, res, next) {
-    // extracts the password & email field from the data 
-    const type = "customer"
-    const plainPassword = req.body.password
-    const email = req.body.email
-    // hash the pssword
-    bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
-        // store hashed password in your database.
-        let sqlquery = "INSERT INTO users (type, pwhash, email) VALUES (?,?,?)"
-        let newrecord = [type, hashedPassword, email]
-        db.query(sqlquery, newrecord, (err, result) => {
-            if (err) {
-                next(err)
-            }
-            else
-                res.send(' User '+req.body.email +' has been added to database. <a href='+'/'+'>Home</a>')
-        })
-    })                                                                       
+router.post('/registered', [check('email').isEmail()], [check('password').isLength({min: 8})], function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.redirect('./register'); }
+    else {
+        // extracts the password & email field from the data 
+        const type = "customer"
+        const plainPassword = req.sanitize(req.body.password)
+        const email = req.sanitize(req.body.email)
+        // hash the pssword
+        bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
+            // store hashed password in your database.
+            let sqlquery = "INSERT INTO users (type, pwhash, email) VALUES (?,?,?)"
+            let newrecord = [type, hashedPassword, email]
+            db.query(sqlquery, newrecord, (err, result) => {
+                if (err) {
+                    next(err)
+                }
+                else
+                    res.send(' User '+req.body.email +' has been added to database. <a href='+'/'+'>Home</a>')
+            })
+        })   
+    }                                                                    
 })
 
 router.get('/list',redirectLogin, function(req, res, next) {
@@ -55,8 +61,8 @@ router.get('/login', function(req, res, next) {
 
 router.post('/loggedin', function(req, res, next) {
     // extracts the password & email field from the data 
-    const plainPassword = req.body.password
-    const email = req.body.email
+    const plainPassword = req.sanitize(req.body.password)
+    const email = req.sanitize(req.body.email)
 
     // set the instructions for when theres an incorect login details
     const userInstruction = "Login details are incorrect, please try again"

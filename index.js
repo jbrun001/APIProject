@@ -1,6 +1,8 @@
 // Import express, ejs, express-session and mysql
 var express = require ('express')
 var session = require ('express-session')
+var validator = require ('express-validator');
+const expressSanitizer = require('express-sanitizer');
 var ejs = require('ejs')
 var mysql = require('mysql2')
 require("dotenv").config();
@@ -11,6 +13,9 @@ const port = 8000
 
 // Tell Express that we want to use EJS as the templating engine
 app.set('view engine', 'ejs')
+
+// Create an input sanitizer
+app.use(expressSanitizer());
 
 // Set up the body parser 
 app.use(express.urlencoded({ extended: true }))
