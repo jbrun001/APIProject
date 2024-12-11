@@ -216,7 +216,9 @@ Security checklist
 - [ ] API use (api key?), API rate limiting (denial of service?)
 - [ ] SQL Injection attacks – sanitisation
 - [ ] Cross Site Scripting – sanitisation
-- [ ] Content headers
+- [ ] Cross Site Request Forgery
+- [ ] Content headers - CORS
+- [ ] Rate limiting for pages as well
 - [ ] zap test? if time
 
 ## API Usage
