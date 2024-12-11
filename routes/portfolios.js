@@ -1,5 +1,7 @@
 const express = require("express")
 const router = express.Router()
+const { validateAndSanitiseUsers } = require('../middleware/validateAndSanitiseInput');
+
 // get the start of the URL from index.js
 const { ORIGIN_URL } = require('../index.js');
 const redirectLogin = (req, res, next) => {
@@ -11,9 +13,9 @@ const redirectLogin = (req, res, next) => {
 }
 
 router.get('/list', redirectLogin,function(req, res, next) {
-    let sqlquery = "SELECT * FROM portfolios where user_id = " + req.session.userId 
+    let sqlquery = "SELECT * FROM portfolios where user_id = ?"  
     // execute sql query
-    db.query(sqlquery, (err, result) => {
+    db.query(sqlquery, [req.session.userId], (err, result) => {
         if (err) {
             next(err)
         }
@@ -56,10 +58,12 @@ router.get('/remove', redirectLogin, function (req, res, next) {
 })
 
 router.post('/removed', redirectLogin,function (req, res, next) {
-    // saving data in database
-    let sqlquery = "INSERT INTO portfolios (name, price) VALUES (?,?)"
+    // remove from the database
+    // include user_id from session to stop editing of the html with
+    // portfolios not for this user
+    let sqlquery = "DELETE FROM portfolios WHERE portfolio_id = ? and user_id = ?"
     // execute sql query
-    let newrecord = [req.body.name, req.body.price]
+    let newrecord = [req.session.userId, req.body.portfolio_id]
     db.query(sqlquery, newrecord, (err, result) => {
         if (err) {
             next(err)

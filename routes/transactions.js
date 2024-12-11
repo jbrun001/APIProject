@@ -1,5 +1,7 @@
 const express = require("express")
 const router = express.Router()
+const { validateAndSanitiseUsers } = require('../middleware/validateAndSanitiseInput');
+
 // get the start of the URL from index.js
 const { ORIGIN_URL } = require('../index.js');
 const redirectLogin = (req, res, next) => {
@@ -11,9 +13,9 @@ const redirectLogin = (req, res, next) => {
 }
 
 router.get('/list', redirectLogin,function(req, res, next) {
-    let sqlquery = "SELECT * FROM transactions where user_id = 1" 
+    let sqlquery = "SELECT * FROM transactions where user_id = ?" 
     // execute sql query
-    db.query(sqlquery, (err, result) => {
+    db.query(sqlquery, [req.session.userId],(err, result) => {
         if (err) {
             next(err)
         }

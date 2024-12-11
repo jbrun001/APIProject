@@ -1,6 +1,7 @@
 // Create a new router
 const express = require("express")
 const { check, validationResult } = require('express-validator');
+const { validateAndSanitiseUsers } = require('../middleware/validateAndSanitiseInput');
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 const router = express.Router()
@@ -15,20 +16,35 @@ const redirectLogin = (req, res, next) => {
 }
 
 router.get('/register', function (req, res, next) {
-    res.render('register.ejs')                                                               
+    // the register route  is called from a url - when 
+    // the user is entering data for the first time
+    // register.ejs is also rendered when there was a 
+    // validation error with the input fields so 
+    // when we render this we need to include empty data
+    // for these fields - so the .ejs still knows about
+    // them
+    res.render('register.ejs', {
+        previousData: {}, // empty object for data previously entered
+        messages: [],     // array for validation messages
+    });
 })    
 
-router.post('/registered', [check('email').isEmail()], [check('password').isLength({min: 8})], function (req, res, next) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        res.redirect('./register'); }
+router.post('/registered', validateAndSanitiseUsers, function (req, res, next) {
+    // check if validation errors and if yes then re-display page with old data and error messages
+    if (req.validationErrors) {
+        // debug to test data is there
+        // res.json({ success: false, previousData: req.body, messages: req.validationErrors });
+        // if there are errors then send the old data and the messages to the form
+        // so they can be displayed
+        return res.render('register.ejs', {
+            previousData: req.body,
+            messages: req.validationErrors,
+        });
+    }
     else {
-        // extracts the password & email field from the data 
         const type = "customer"
-        const plainPassword = req.sanitize(req.body.password)
-        const email = req.sanitize(req.body.email)
         // hash the pssword
-        bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
+        bcrypt.hash(req.body.password, saltRounds, function(err, hashedPassword) {
             // store hashed password in your database.
             let sqlquery = "INSERT INTO users (type, pwhash, email) VALUES (?,?,?)"
             let newrecord = [type, hashedPassword, email]

@@ -2,6 +2,7 @@ const express = require("express")
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt')
 const router = express.Router()
+const { validateAndSanitiseUsers } = require('../middleware/validateAndSanitiseInput');
 
 // get the start of the URL from index.js
 const { ORIGIN_URL } = require('../index.js');
@@ -19,9 +20,10 @@ router.get('/search',redirectLogin,function(req, res, next){
 
 router.get('/search_result',redirectLogin, function (req, res, next) {
     // Search the database
-    let sqlquery = "SELECT * FROM funds WHERE name LIKE '%" + req.sanitize(req.query.search_text) + "%'"
+    let sqlquery = "SELECT * FROM funds WHERE name LIKE ?"
+    const searchText = '%' + req.query.search_text + '%';
     // execute sql query
-    db.query(sqlquery, (err, result) => {
+    db.query(sqlquery,[searchText], (err, result) => {
         if (err) {
             next(err)
         }

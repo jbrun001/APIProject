@@ -301,3 +301,15 @@ h1 {
 .fab i {
   font-size: 24px;
 }
+
+/* styling for input fields that have validation errors */
+.error-field input {
+  border: 2px solid red;
+  background-color: #ffe6e6;
+}
+
+/* styling for validation error message */
+.error-message {
+  color: red;
+  font-size: 0.9em;
+}
