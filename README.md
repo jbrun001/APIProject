@@ -212,10 +212,10 @@ My application is a stock portfolio reporting system.
 
 Security checklist
 - [ ] Transport SSL
-- [ ] Passwords bcrypt , passwords complexity
+- [X] Passwords bcrypt , passwords complexity
 - [ ] API use (api key?), API rate limiting (denial of service?)
-- [ ] SQL Injection attacks – sanitisation
-- [ ] Cross Site Scripting – sanitisation
+- [X] SQL Injection attacks – sanitisation
+- [X] Cross Site Scripting – sanitisation
 - [ ] Cross Site Request Forgery
 - [ ] Content headers - CORS
 - [ ] Rate limiting for pages as well
