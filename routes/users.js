@@ -5,6 +5,16 @@ const { validateAndSanitiseUsers } = require('../middleware/validateAndSanitiseI
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 const router = express.Router()
+
+// Security. Import express-rate-limit so we can stop brute forcing
+// of the login
+const rateLimit = require('express-rate-limit');
+const loginRateLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000,            // 1 minute before retry
+    max: 5,                             // limit each IP to 5 login attempts per minute
+    message: 'Too many login attempts, please try again after a minute.'
+});
+
 // get the start of the URL from index.js
 const { ORIGIN_URL } = require('../index.js');
 const redirectLogin = (req, res, next) => {
@@ -75,7 +85,7 @@ router.get('/login', function(req, res, next) {
     res.render('login.ejs', {userInstruction})  
 })
 
-router.post('/loggedin', function(req, res, next) {
+router.post('/loggedin', loginRateLimiter, function(req, res, next) {
     // extracts the password & email field from the data 
     const plainPassword = req.sanitize(req.body.password)
     const email = req.sanitize(req.body.email)

@@ -5,7 +5,10 @@ var validator = require ('express-validator');
 const expressSanitizer = require('express-sanitizer');
 var ejs = require('ejs')
 var mysql = require('mysql2')
-require("dotenv").config();
+
+// Import dotenv so we can store secrets out of view of github
+// and we can have different settings for production and development
+require("dotenv").config();  
 
 // Create the express application object
 const app = express()
@@ -25,13 +28,17 @@ app.use(express.static(__dirname + '/public'))
 
 // Create a session
 app.use(session({
-    secret: '92&*^hGue(98',
+    secret: process.env.SESSION_SECRET,       // use long session secret and keep in .env so not published on github
+    name: process.env.SESSION_NAME,           // use a random session name so it's unpredictable for attackers, and put in .env
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: false,                 // don't save sessions unless it's needed
     cookie: {
-        expires: 600000
+        expires: 600000                       // 10 mins before re-login is this too long?
     }
 }))
+
+// Security.  Disable this header to make it harder for attackers to know what technology is being used
+app.disable('x-powered-by')   
 
 // Define the database connection
 // check to see if the .env has a variable LOCAL_DB=true  if this variable is present and set to true
@@ -98,6 +105,16 @@ app.use('/transactions', transactionsRoutes)
 const fundsRoutes = require('./routes/funds')
 app.use('/funds', fundsRoutes)
 
+// security. custom 404 so default will not give away we are using express
+app.use((req, res, next) => {
+  res.status(404).send("That resouce cannot be found")
+})
+
+// security. custom error so default will not give away we are using express
+app.use((err, req, res, next) => {
+  console.error(err.stack)
+  res.status(500).send('An error has occured')
+})
 
 // Start the web app listening
 app.listen(port, () => console.log(`Node app listening on port ${port}!`))
