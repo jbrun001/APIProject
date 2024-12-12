@@ -39,60 +39,60 @@
                 </div>
                 <!-- results Table -->
                 <div class="results-container">
-                    <table class="funds-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Ticker</th>
-                                <th>Size</th>
-                                <th>Fee (%)</th>
-                                <th>Dividend Yield (%)</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% funds.forEach(function(fund) { %>
-                                <tr>
-                                    <td><%= fund.name %></td>
-                                    <td><%= fund.ticker %></td>
-                                    <td><%= fund.size.toLocaleString() %></td>
-                                    <td><%= fund.fee %></td>
-                                    <td><%= fund.dividend_yield %></td>
-                                    <td>
-                                    <button class="details-btn" onclick="toggleDetails('<%= fund.isin %>')">Details</button>
+                    <ul class="item-list">
+                        <% funds.forEach(function(fund) { %>
+                        <li class="item" onclick="toggleDetails('<%= fund.isin %>')">
+                            <div class="item-row">
+                                <div class="item-icon">
+                                    <i class="material-icons">insights</i>
+                                </div>
+                                <div class="item-content">
+                                    <span class="item-name"><%= fund.name %> (<%= fund.ticker %>)</span>
+                                    <span class="item-value">Size: <%= fund.size.toLocaleString() %></span>
+                                    <span class="item-value">Fee: <%= fund.fee %>%</span>
+                                    <span class="item-value">Dividend Yield: <%= fund.dividend_yield %>%</span>
+                                </div>
+                                <div class="item-actions">
                                     <form action="/transactions/add" method="POST" style="display: inline;">
+                                        <div class="filter-field">
+                                            <label for="portfolio_id">Portfolio</label>                                
+                                            <select name="portfolio_id">
+                                                <option value="1">ISA</option>
+                                                <option value="2">GIA</option>
+                                                <option value="3">another very long name extremely long name</option>
+                                            </select>
+                                        </div>
                                         <input type="hidden" name="fund_id" value="<%= fund.fund_id %>">
                                         <input type="hidden" name="fund_name" value="<%= fund.name %> (<%= fund.ticker %>)">
-                                        <button type="submit" class="add-btn">Buy</button>
+                                        <button type="submit" class="add-btn">Add fund to portfolio</button>
                                     </form>
-                                    </td>
-                                </tr>
-                                <tr class="details-row" id="details-<%= fund.isin %>" style="display: none;">
-                                    <td colspan="6">
-                                        <div>
-                                            <strong>ISIN:</strong> <%= fund.isin %> <br>
-                                            <strong>Distribution:</strong> <%= fund.distribution %> <br>
-                                            <strong>Holdings:</strong> <%= fund.holdings.toLocaleString() %> <br>
-                                            <strong>Last Update:</strong> <%= fund.last_update.toISOString().split('T')[0] %>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
+                                </div>
+                            </div>
+                            <!-- Expanded Details Section -->
+                            <div class="item-details-row" id="details-<%= fund.isin %>" style="display: none;">
+                                <div class="details-content">
+                                    <p><strong>ISIN:</strong> <%= fund.isin %></p>
+                                    <p><strong>Distribution:</strong> <%= fund.distribution %></p>
+                                    <p><strong>Holdings:</strong> <%= fund.holdings.toLocaleString() %></p>
+                                    <p><strong>Last Update:</strong> <%= fund.last_update.toISOString().split('T')[0] %></p>
+                                </div>
+                            </div>
+                        </li>
+                        <% }) %>
+                    </ul>        
                 </div>
             </div>
         </main>
         <%- include('footerMenu') %>
         <script>
-              function toggleDetails(isin) {
-                  const detailsRow = document.getElementById(`details-${isin}`);
-                  if (detailsRow.style.display === "none") {
-                      detailsRow.style.display = "table-row";
-                  } else {
-                      detailsRow.style.display = "none";
-                  }
-              }
+            function toggleDetails(isin) {
+                const detailsRow = document.getElementById(`details-${isin}`);
+                if (detailsRow.style.display === "none" || !detailsRow.style.display) {
+                    detailsRow.style.display = "flex";
+                } else {
+                    detailsRow.style.display = "none";
+                }
+            }
         </script>
     </body>
 </html>
