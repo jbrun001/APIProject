@@ -11,70 +11,76 @@
         <%- include('headerMenu') %>
         <main class="content">
             <div class="main">
-                <h1>Fund Library Search Results</h1>
-
-                <!-- Filter and Sort Options -->
-                <div class="filters">
+                <!-- filter and sort options -->
+                <div class="filter-container">
                     <form action="/funds/search-result" method="GET">
-                        <input type="text" name="search_text" placeholder="Search funds..." value="<%= previousData.search_text %>">
-                        <select name="sort_by">
-                            <option value="size">Size</option>
-                            <option value="fee">Fee</option>
-                            <option value="dividend_yield">Dividend Yield</option>
-                        </select>
+                        <div class="filter-field <%= messages.some(error => error.field === 'search_text') ? 'error-field' : '' %>">
+                            <label for="search_text">Search for</label>
+                            <input type="text" name="search_text" placeholder="Search funds..." value="<%= previousData.search_text %>">
+                        </div>
+                        <div class="filter-field <%= messages.some(error => error.field === 'sort_by') ? 'error-field' : '' %>">
+                            <label for="sort_by">Sort by</label>                                
+                            <select name="sort_by">
+                                <option value="size" <%= previousData.sort_by === 'size' ? 'selected' : '' %>>Size</option>
+                                <option value="fee" <%= previousData.sort_by === 'fee' ? 'selected' : '' %>>Fee</option>
+                                <option value="dividend_yield" <%= previousData.sort_by === 'dividend_yield' ? 'selected' : '' %>>Dividend Yield</option>
+                            </select>
+                        </div>
                         <button type="submit" class="search-btn">Search</button>
-                        <!-- validation errors -->
-                        <% if (messages.length > 0) { %>
+                    </form>
+                    <!-- validation errors -->
+                    <% if (messages.length > 0) { %>
                         <ul>
                             <% messages.forEach(function(error) { %>
                             <li><%= error.message %></li>
                             <% }); %>
                         </ul>
-                        <% } %>
-                     </form>
+                    <% } %>
                 </div>
                 <!-- results Table -->
-                <table class="funds-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Ticker</th>
-                            <th>Size</th>
-                            <th>Fee (%)</th>
-                            <th>Dividend Yield (%)</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% funds.forEach(function(fund) { %>
+                <div class="results-container">
+                    <table class="funds-table">
+                        <thead>
                             <tr>
-                                <td><%= fund.name %></td>
-                                <td><%= fund.ticker %></td>
-                                <td><%= fund.size.toLocaleString() %></td>
-                                <td><%= fund.fee %></td>
-                                <td><%= fund.dividend_yield %></td>
-                                <td>
-                                  <button class="details-btn" onclick="toggleDetails('<%= fund.isin %>')">Details</button>
-                                  <form action="/transactions/add" method="POST" style="display: inline;">
-                                    <input type="hidden" name="fund_id" value="<%= fund.fund_id %>">
-                                    <input type="hidden" name="fund_name" value="<%= fund.name %> (<%= fund.ticker %>)">
-                                    <button type="submit" class="add-btn">Buy</button>
-                                  </form>
-                                </td>
+                                <th>Name</th>
+                                <th>Ticker</th>
+                                <th>Size</th>
+                                <th>Fee (%)</th>
+                                <th>Dividend Yield (%)</th>
+                                <th>Actions</th>
                             </tr>
-                            <tr class="details-row" id="details-<%= fund.isin %>" style="display: none;">
-                                <td colspan="6">
-                                    <div>
-                                        <strong>ISIN:</strong> <%= fund.isin %> <br>
-                                        <strong>Distribution:</strong> <%= fund.distribution %> <br>
-                                        <strong>Holdings:</strong> <%= fund.holdings.toLocaleString() %> <br>
-                                        <strong>Last Update:</strong> <%= fund.last_update.toISOString().split('T')[0] %>
-                                    </div>
-                                </td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <% funds.forEach(function(fund) { %>
+                                <tr>
+                                    <td><%= fund.name %></td>
+                                    <td><%= fund.ticker %></td>
+                                    <td><%= fund.size.toLocaleString() %></td>
+                                    <td><%= fund.fee %></td>
+                                    <td><%= fund.dividend_yield %></td>
+                                    <td>
+                                    <button class="details-btn" onclick="toggleDetails('<%= fund.isin %>')">Details</button>
+                                    <form action="/transactions/add" method="POST" style="display: inline;">
+                                        <input type="hidden" name="fund_id" value="<%= fund.fund_id %>">
+                                        <input type="hidden" name="fund_name" value="<%= fund.name %> (<%= fund.ticker %>)">
+                                        <button type="submit" class="add-btn">Buy</button>
+                                    </form>
+                                    </td>
+                                </tr>
+                                <tr class="details-row" id="details-<%= fund.isin %>" style="display: none;">
+                                    <td colspan="6">
+                                        <div>
+                                            <strong>ISIN:</strong> <%= fund.isin %> <br>
+                                            <strong>Distribution:</strong> <%= fund.distribution %> <br>
+                                            <strong>Holdings:</strong> <%= fund.holdings.toLocaleString() %> <br>
+                                            <strong>Last Update:</strong> <%= fund.last_update.toISOString().split('T')[0] %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
         <%- include('footerMenu') %>

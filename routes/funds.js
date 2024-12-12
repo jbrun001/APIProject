@@ -25,7 +25,7 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
     // Search the list of available funds
     if (req.validationErrors) {
         // debug to test data is there
-        console.log({ success: false, previousData: req.query, messages: req.validationErrors });
+//        console.log({ success: false, previousData: req.query, messages: req.validationErrors });
         // if there are errors then send the old data and the messages to the form
         // so they can be displayed
         return res.render('fundsSearchResults.ejs', {
@@ -35,6 +35,8 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
         });
     }
     else {
+        // debug to test data is there       
+//        console.log({ success: true, previousData: req.query, messages: req.validationErrors });
         // if there is a sorting parameter then order by that
         let order = ' ORDER BY NAME ASC'
         if (req.query.sort_by) {
@@ -43,7 +45,7 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
         let sqlquery = "SELECT * FROM funds WHERE name LIKE ?" + order
         const searchText = '%' + req.query.search_text + '%';
         // execute sql query
-        console.log(sqlquery)
+//        console.log(sqlquery)
         db.query(sqlquery,[searchText], (err, result) => {
             if (err) {
                 next(err)

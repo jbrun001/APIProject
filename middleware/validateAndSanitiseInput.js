@@ -25,7 +25,7 @@ const validateAndSanitiseFunds = [
     query('sort_by')
         .optional()
         .isIn(['size', 'fee', 'dividend_yield'])
-        .withMessage('Incorrect sorting request. Please use sorting options in the dropdown.')
+        .withMessage('Incorrect sorting field')
         .trim(),
     sanitiseInputs,
     (req, res, next) => {
@@ -48,7 +48,7 @@ const validateAndSanitiseFunds = [
 
 const validateAndSanitisePortfolios = [
     body('name')
-        .optional() // Only validate if the field exists
+        .optional() // only validate if the field exists
         .isLength({ min: 3 })
         .withMessage('Portfolio name must be at least 3 characters long.')
         .trim(),
