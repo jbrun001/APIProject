@@ -2,8 +2,11 @@
 const express = require("express")
 const { check, validationResult } = require('express-validator');
 const { validateAndSanitiseUsers } = require('../middleware/validateAndSanitiseInput');
+const { getLoggedInUser } = require('../helpers/getLoggedInUser');
+
 const bcrypt = require('bcrypt')
 const saltRounds = 10
+
 const router = express.Router()
 
 // Security. Import express-rate-limit so we can stop brute forcing
@@ -26,6 +29,7 @@ const redirectLogin = (req, res, next) => {
 }
 
 router.get('/register', function (req, res, next) {
+    let loggedInStatus = getLoggedInUser(req)
     // the register route  is called from a url - when 
     // the user is entering data for the first time
     // register.ejs is also rendered when there was a 
@@ -34,12 +38,14 @@ router.get('/register', function (req, res, next) {
     // for these fields - so the .ejs still knows about
     // them
     res.render('register.ejs', {
+        loggedInStatus,
         previousData: {}, // empty object for data previously entered
         messages: [],     // array for validation messages
     });
 })    
 
 router.post('/registered', validateAndSanitiseUsers, function (req, res, next) {
+    let loggedInStatus = getLoggedInUser(req)
     // check if validation errors and if yes then re-display page with old data and error messages
     if (req.validationErrors) {
         // debug to test data is there
@@ -47,6 +53,7 @@ router.post('/registered', validateAndSanitiseUsers, function (req, res, next) {
         // if there are errors then send the old data and the messages to the form
         // so they can be displayed
         return res.render('register.ejs', {
+            loggedInstatus,
             previousData: req.body,
             messages: req.validationErrors,
         });
@@ -76,13 +83,15 @@ router.get('/list',redirectLogin, function(req, res, next) {
         if (err) {
             next(err)
         }
-        res.render("userList.ejs", {userList:result})
+        let loggedInStatus = getLoggedInUser(req)
+        res.render("userList.ejs", {userList:result,loggedInStatus})
     })
 })
 
 router.get('/login', function(req, res, next) {
     const userInstruction = " "
-    res.render('login.ejs', {userInstruction})  
+    let loggedInStatus = getLoggedInUser(req)
+    res.render('login.ejs', {userInstruction, loggedInStatus})  
 })
 
 router.post('/loggedin', loginRateLimiter, function(req, res, next) {
@@ -106,7 +115,8 @@ router.post('/loggedin', loginRateLimiter, function(req, res, next) {
         // check if no results from the sql - this means this user doesn't exist
         else if (dbresult == null || dbresult.length === 0) {
             console.error("logged in: user not found in database")
-            res.render('login.ejs', {userInstruction})  
+            let loggedInStatus = getLoggedInUser(req)
+            res.render('login.ejs', {userInstruction, loggedInStatus})   
         }
         else { 
             req.session.userType = dbresult[0].type;
@@ -121,10 +131,12 @@ router.post('/loggedin', loginRateLimiter, function(req, res, next) {
                     req.session.userEmail = dbresult[0].email;
                     req.session.userId = dbresult[0].id;
                     req.session.userType = dbresult[0].type;
-                    res.redirect("/") // redirect to the home page with the links on it
+                    let loggedInStatus = getLoggedInUser(req)
+                    res.render('index.ejs', {loggedInStatus})  
                 }
                 else {
-                    res.render('login.ejs', {userInstruction})  
+                    let loggedInStatus = getLoggedInUser(req)
+                    res.render('login.ejs', {userInstruction, loggedInStatus})  
                 }
             })
         }
@@ -132,10 +144,10 @@ router.post('/loggedin', loginRateLimiter, function(req, res, next) {
 })
 router.get('/logout', redirectLogin, (req,res) => {
     req.session.destroy(err => {
-    if (err) {
-      return res.redirect('./')
-    }
-    res.send('you are now logged out. <a href='+'/'+'>Home</a>');
+        if (err) {
+        return res.redirect('index.ejs')
+        }
+        res.redirect("/") // redirect to the home page with the links on it
     })
 })
 

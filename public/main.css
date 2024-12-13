@@ -132,6 +132,15 @@ body {
     white-space: nowrap;                                    /* don't wrap */
     margin-left: auto;                                      /* make sure it's on the right */
     padding-right: 2%;     
+    align-items: center;
+}
+
+/* style the user logged in icon so it's aligned centre*/
+.user-info .material-icons {
+    font-size: 1.5rem; 
+    margin-right: 8px; 
+    vertical-align: middle; /* Ensure alignment with text */
+    color: white; 
 }
 
 .menu.collapsed + .header {                                 /* + = only applies to header when the previous element is .menu_collapsed */

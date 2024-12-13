@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const { validateAndSanitisePortfolios } = require('../middleware/validateAndSanitiseInput');
+const { getLoggedInUser } = require('../helpers/getLoggedInUser');
 
 // get the start of the URL from index.js
 const { ORIGIN_URL } = require('../index.js');
@@ -13,20 +14,23 @@ const redirectLogin = (req, res, next) => {
 }
 
 router.get('/list', redirectLogin,function(req, res, next) {
+    let loggedInStatus = getLoggedInUser(req)
     let sqlquery = "SELECT * FROM portfolios where user_id = ?"  
     // execute sql query
     db.query(sqlquery, [req.session.userId], (err, result) => {
         if (err) {
             next(err)
         }
-        res.render("portfoliosList.ejs", {availablePortfolios:result})
+        res.render("portfoliosList.ejs", {loggedInStatus, availablePortfolios:result})
      })
 })
 
 
 router.get('/add', redirectLogin, function (req, res, next) {
+    let loggedInStatus = getLoggedInUser(req)
     if (req.session.userType == 'admin' || req.session.userType == 'customer') {
         res.render("portfoliosAdd.ejs", {
+            loggedInStatus,
             previousData: {}, // empty object for data previously entered
             messages: [],     // array for validation messages
         });
@@ -36,6 +40,7 @@ router.get('/add', redirectLogin, function (req, res, next) {
 })
 
 router.post('/added', validateAndSanitisePortfolios, redirectLogin,function (req, res, next) {
+    let loggedInStatus = getLoggedInUser(req)
     // saving this portfolio for this user in the database
     if (req.validationErrors) {
         // debug to test data is there
@@ -43,6 +48,7 @@ router.post('/added', validateAndSanitisePortfolios, redirectLogin,function (req
         // if there are errors then send the old data and the messages to the form
         // so they can be displayed
         return res.render('portfoliosAdd.ejs', {
+            loggedInStatus,
             previousData: req.body,
             messages: req.validationErrors,
         });
@@ -61,29 +67,22 @@ router.post('/added', validateAndSanitisePortfolios, redirectLogin,function (req
     }
 }) 
 
-
-router.get('/remove', redirectLogin, function (req, res, next) {
-    if (req.session.userType == 'admin')
-    {
-        res.render("portfoliosRemove.ejs")
-    }else{
-        res.send('You do not have permissions to remove a portfolio. <a href='+'/'+'>Home</a>')
-    }
-})
-
-router.post('/removed', redirectLogin,function (req, res, next) {
+router.post('/remove', redirectLogin,function (req, res, next) {
+    let loggedInStatus = getLoggedInUser(req)
     // remove from the database
     // include user_id from session to stop editing of the html with
     // portfolios not for this user
-    let sqlquery = "DELETE FROM portfolios WHERE portfolio_id = ? and user_id = ?"
+    let sqlquery = "DELETE FROM portfolios WHERE id = ? and user_id = ?"
     // execute sql query
-    let newrecord = [req.session.userId, req.body.portfolio_id]
+    let newrecord = [req.body.portfolio_id, req.session.userId]
     db.query(sqlquery, newrecord, (err, result) => {
         if (err) {
             next(err)
         }
-        else
-            res.send(' This portfolio is removed from the database, name: '+ req.body.name)
+        else {
+            // res.send(' This portfolio is removed from the database, name: '+ req.body.name)
+            res.redirect("/portfolios/list")
+        }
     })
 }) 
 

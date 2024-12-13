@@ -135,6 +135,16 @@ const validateAndSanitiseTransactions = [
         .isFloat()
         .withMessage('price must be a float')
         .trim(),
+    body('transaction_date')
+        .optional()
+        .isISO8601()
+        .withMessage('the date must be valid')
+        .trim(),
+    body('transaction_id')
+        .optional() 
+        .isFloat()
+        .withMessage('price must be a float')
+        .trim(),
 
     sanitiseInputs,
     (req, res, next) => {
