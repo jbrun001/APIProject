@@ -18,6 +18,10 @@
                     <input type="hidden" name="fund_id" value="<%=fund_id%>">
                     <input type="hidden" name="fund_name" value="<%=fund_name%>">
                 </div>
+                <div class="input-field <%= messages.some(error => error.field === 'transaction_date') ? 'error-field' : '' %>">
+                    <label for="transaction_date">Transaction Date:</label>
+                    <input type="date" id="transaction_date" name="transaction_date" value="<%= previousData.transaction_date || new Date().toISOString().split('T')[0] %>" required>
+                </div>
                 <div class="input-field <%= messages.some(error => error.field === 'volume') ? 'error-field' : '' %>">
                     <label for="volume">Number of shares:</label>
                     <input type="number" step="any" id="volume" name="volume" value="<%= previousData.volume || '' %>" required>

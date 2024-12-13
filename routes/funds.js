@@ -69,14 +69,14 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
 router.post('/list',validateAndSanitiseFunds, redirectLogin, function(req, res, next) {
     let loggedInStatus = getLoggedInUser(req)
     // group transactions to get list of funds in this portfolio
-    let sqlquery = `SELECT transactions.fund_id, funds.ticker, funds.name, 
+    let sqlquery = `SELECT transactions.fund_id as fund_id, funds.ticker, funds.name, 
                     	SUM(transactions.volume * transactions.share_price) AS total_cost, 
                         SUM(transactions.volume) AS total_shares,
                         MAX(transactions.transaction_date) AS last_transaction
                     FROM transactions JOIN funds ON transactions.fund_id = funds.id 
                     WHERE transactions.user_id = ? AND transactions.portfolio_id = ?
                     GROUP BY transactions.fund_id, funds.name 
-                    ORDER BY funds.name;` 
+                    ORDER BY funds.name` 
     // execute sql query
     db.query(sqlquery,[req.body.portfolio_id, req.session.userId, req.body.portfolio_id], (err, result) => {
         if (err) {

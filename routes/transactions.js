@@ -45,10 +45,11 @@ router.post('/add', redirectLogin, function (req, res, next) {
 
 router.post('/added', validateAndSanitiseTransactions, redirectLogin, function (req, res, next) {
     // check if validation errors and if yes then re-display page with old data and error messages
+//    console.log({ success: "testing", previousData: req.body, messages: req.validationErrors });
     let loggedInStatus = getLoggedInUser(req)
     if (req.validationErrors) {
         // debug to test data is there
-        console.log({ success: false, previousData: req.body, messages: req.validationErrors });
+//        console.log({ success: false, previousData: req.body, messages: req.validationErrors });
         // if there are errors then send the old data and the messages to the form
         // so they can be displayed
         return res.render('transactionsAdd.ejs', {
@@ -62,9 +63,9 @@ router.post('/added', validateAndSanitiseTransactions, redirectLogin, function (
     }
     else {
         // saving data in database
-        let sqlquery = "INSERT INTO transactions (user_id, fund_id, portfolio_id, volume, share_price) VALUES (?,?,?,?,?)"
+        let sqlquery = "INSERT INTO transactions (user_id, fund_id, portfolio_id, volume, share_price, transaction_date) VALUES (?,?,?,?,?,?)"
         // execute sql query
-        let newrecord = [req.session.userId, req.body.fund_id, req.body.portfolio_id, req.body.volume, req.body.share_price]
+        let newrecord = [req.session.userId, req.body.fund_id, req.body.portfolio_id, req.body.volume, req.body.share_price, req.body.transaction_date]
         db.query(sqlquery, newrecord, (err, result) => {
             if (err) {
                 next(err)
