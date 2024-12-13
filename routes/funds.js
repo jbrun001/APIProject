@@ -136,7 +136,7 @@ router.get('/add',validateAndSanitiseFunds, redirectLogin, function (req, res, n
     let loggedInStatus = getLoggedInUser(req)
     if (req.session.userType == 'admin') {
         res.render("fundsAdd.ejs",loggedInStatus)
-    } else res.redirect("/")
+    } else res.redirect(ORIGIN_URL+"/")
 })
 
 router.post('/added',validateAndSanitiseFunds, function (req, res, next) {

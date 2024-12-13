@@ -53,7 +53,7 @@ router.post('/registered', validateAndSanitiseUsers, function (req, res, next) {
         // if there are errors then send the old data and the messages to the form
         // so they can be displayed
         return res.render('register.ejs', {
-            loggedInstatus,
+            loggedInStatus,
             previousData: req.body,
             messages: req.validationErrors,
         });
@@ -64,13 +64,12 @@ router.post('/registered', validateAndSanitiseUsers, function (req, res, next) {
         bcrypt.hash(req.body.password, saltRounds, function(err, hashedPassword) {
             // store hashed password in your database.
             let sqlquery = "INSERT INTO users (type, pwhash, email) VALUES (?,?,?)"
-            let newrecord = [type, hashedPassword, email]
+            let newrecord = [type, hashedPassword, req.body.email]
             db.query(sqlquery, newrecord, (err, result) => {
                 if (err) {
                     next(err)
                 }
-                else
-                    res.send(' User '+req.body.email +' has been added to database. <a href='+'/'+'>Home</a>')
+                else res.redirect(ORIGIN_URL+"/")
             })
         })   
     }                                                                    
@@ -133,6 +132,7 @@ router.post('/loggedin', loginRateLimiter, function(req, res, next) {
                     req.session.userType = dbresult[0].type;
                     let loggedInStatus = getLoggedInUser(req)
                     res.render('index.ejs', {loggedInStatus})  
+                    console.log("logged in: user: " + req.session.userEmail)
                 }
                 else {
                     let loggedInStatus = getLoggedInUser(req)
@@ -147,7 +147,7 @@ router.get('/logout', redirectLogin, (req,res) => {
         if (err) {
         return res.redirect('index.ejs')
         }
-        res.redirect("/") // redirect to the home page with the links on it
+        res.redirect(ORIGIN_URL+"/") // redirect to the home page with the links on it
     })
 })
 

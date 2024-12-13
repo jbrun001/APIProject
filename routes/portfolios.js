@@ -61,7 +61,7 @@ router.post('/added', validateAndSanitisePortfolios, redirectLogin,function (req
                 next(err)
             }
             else
-                res.redirect("/portfolios/list")  // if successful list all the portfolios 
+                res.redirect(ORIGIN_URL+"/portfolios/list")  // if successful list all the portfolios 
         })
     }
 }) 
@@ -80,7 +80,7 @@ router.post('/remove', redirectLogin,function (req, res, next) {
         }
         else {
             // res.send(' This portfolio is removed from the database, name: '+ req.body.name)
-            res.redirect("/portfolios/list")
+            res.redirect(ORIGIN_URL+"/portfolios/list")
         }
     })
 }) 

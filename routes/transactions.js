@@ -72,7 +72,7 @@ router.post('/added', validateAndSanitiseTransactions, redirectLogin, function (
             }
             else
                // res.render("fundsList.ejs",{loggedInStatus, portfolio_id:req.body.portfolio_id})
-                res.redirect("/portfolios/list")
+                res.redirect(ORIGIN_URL+"/portfolios/list")
         })
     } 
 }) 
@@ -86,8 +86,7 @@ router.post('/remove',validateAndSanitiseTransactions, redirectLogin,function (r
         if (err) {
             next(err)
         }
-        else
-            res.redirect("/transactions/list")
+        else res.redirect(ORIGIN_URL+"/transactions/list")
     })
 }) 
 

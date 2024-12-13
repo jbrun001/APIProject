@@ -427,7 +427,7 @@ h1 {
 }
 
 /* formatting for all buttons and button hovering in one place */
-.delete-btn, .add-btn, .search-btn, .details-btn, .filter-container .search-btn  {
+.delete-btn, .add-btn, .search-btn, .details-btn, .filter-container .search-btn {
     background-color: var(--background-colour);
     color: white;
     border: none;
@@ -437,6 +437,8 @@ h1 {
     transition: background-color 0.2s ease;
     margin-top: 20px;
     display: block;
+    text-align: center;
+    text-decoration: none;                                  /* remove underline if it's a link */
 }
 
 .delete-btn:hover, .add-btn:hover, .search-btn:hover, .submit-button:hover, .fab:hover, .filter-container .search-btn:hover {
