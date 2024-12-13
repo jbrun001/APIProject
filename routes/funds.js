@@ -22,9 +22,37 @@ router.get('/search',redirectLogin,function(req, res, next){
     });
 })
 
+// getFundsSearchResults
+// gets searches funds based on the parameters passed and orders the result by the sort_by parameter
+// this uses a promise, the calling code will wait for this to return a result before it continues
+// this is necessary when we need to get results from multiple data queries (rather than nesting them)
+// and this code could be re-used by other routes 
+function getFundSearchResult(search_text, sort_by) {
+    // console.log('getFundSearchResult: search_text: >' + search_text + '< sort_by: >' + sort_by +'<')
+    return new Promise((resolve, reject) => {
+        let sqlquery = "";
+        search_text = '%' + search_text + '%'
+        let order = ' ' + sort_by + ' DESC'                         // default is descending order
+        if (sort_by === "fee") order = ' fee ASC'                  // except fees which are in ascending order
+        sqlquery = "SELECT * FROM funds WHERE name LIKE '" + search_text + "' ORDER BY " + order
+        // console.log('getFundSearchResult: sqlquery: >' + sqlquery + '<')
+        // execute sql query
+        db.query(sqlquery, (err, results) => {
+            if (err) {
+                console.error(err.message);
+                reject(err); // if there is an error reject the Promise
+            } else {
+                resolve(results); // the Promise is resolved with the result of the query
+            }
+        });
+    });
+}
+  
+
 router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (req, res, next) {
     // Search the list of available funds
     let loggedInStatus = getLoggedInUser(req)
+    console.log({ test: "search-result-promise", previousData: req.query, messages: req.validationErrors });
     if (req.validationErrors) {
         // debug to test data is there
 //        console.log({ success: false, previousData: req.query, messages: req.validationErrors });
@@ -38,33 +66,22 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
         });
     }
     else {
-        // debug to test data is there       
-//        console.log({ success: true, previousData: req.query, messages: req.validationErrors });
-        // if there is a sorting parameter then order by that
-        let order = ' ORDER BY NAME ASC'
-        if (req.query.sort_by) {
-            order = ' ORDER BY ' + req.query.sort_by + ' ASC'
-        }
-        let sqlquery = "SELECT * FROM funds WHERE name LIKE ?" + order
-        const searchText = '%' + req.query.search_text + '%';
-        // execute sql query
-//        console.log(sqlquery)
-        db.query(sqlquery,[searchText], (err, result) => {
-            if (err) {
-                next(err)
-            }
-            res.render("fundsSearchResults.ejs", 
-                {
-                    loggedInStatus,
-                    funds:result,
-                    previousData: req.query,
-                    messages: [],  // if code here then it's successful and messages is empty
-                }
-            )
+        Promise.all([
+            getFundSearchResult(req.query.search_text, req.query.sort_by)       // Promise.all[0]
+        ])
+        .then(([getFundSearchResult]) => {     // if you had more data just add the name of it here first variable is the result of promise.all[0] etc.
+            res.render("fundsSearchResults.ejs", {
+                loggedInStatus,
+                funds: getFundSearchResult,
+                previousData: req.query,
+                messages: [],  // if code here then it's successful and messages is empty
+            });
         })
-    } 
+ //       .catch((error) => {
+ //           console.log("Error getting data from database calls or in the code above");
+ //       });
+    }
 })
-
 
 router.post('/list',validateAndSanitiseFunds, redirectLogin, function(req, res, next) {
     let loggedInStatus = getLoggedInUser(req)
