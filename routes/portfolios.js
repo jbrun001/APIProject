@@ -25,7 +25,6 @@ router.get('/list', redirectLogin,function(req, res, next) {
      })
 })
 
-
 router.get('/add', redirectLogin, function (req, res, next) {
     let loggedInStatus = getLoggedInUser(req)
     if (req.session.userType == 'admin' || req.session.userType == 'customer') {

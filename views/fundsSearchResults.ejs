@@ -53,19 +53,24 @@
                                     <span class="item-value">Dividend Yield: <%= fund.dividend_yield %>%</span>
                                 </div>
                                 <div class="item-actions">
-                                    <form action="/transactions/add" method="POST" style="display: inline;">
-                                        <div class="filter-field">
-                                            <label for="portfolio_id">Portfolio</label>                                
-                                            <select name="portfolio_id">
-                                                <option value="1">ISA</option>
-                                                <option value="2">GIA</option>
-                                                <option value="3">another very long name extremely long name</option>
-                                            </select>
-                                        </div>
-                                        <input type="hidden" name="fund_id" value="<%= fund.id %>">
-                                        <input type="hidden" name="fund_name" value="<%= fund.name %> (<%= fund.ticker %>)">
-                                        <button type="submit" class="add-btn">Add fund to portfolio</button>
-                                    </form>
+                                    <% if (portfolios.length > 0) { %>
+                                        <form action="/transactions/add" method="POST" style="display: inline;">
+                                            <div class="filter-field">
+                                                <label for="portfolio_id">Portfolio</label>                                
+                                                <select name="portfolio_id">
+                                                    <% portfolios.forEach(function(portfolio) { %>  
+                                                        <option value="<%=portfolio.id%>"><%=portfolio.name%></option>
+                                                    <% }) %>  
+                                                </select>
+                                            </div>
+                                            <input type="hidden" name="fund_id" value="<%= fund.id %>">
+                                            <input type="hidden" name="fund_name" value="<%= fund.name %> (<%= fund.ticker %>)">
+                                            <button type="submit" class="add-btn">Add fund to portfolio</button>
+                                        </form>
+                                    <% } else { %>
+                                        <p>No portfolios to add this fund to</p>
+                                        <button type="submit" class="add-btn">Create a Portfolio</button>
+                                    <% } %>
                                 </div>
                             </div>
                             <!-- Expanded Details Section -->

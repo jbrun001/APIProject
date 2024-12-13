@@ -27,15 +27,15 @@ router.get('/search',redirectLogin,function(req, res, next){
 // this uses a promise, the calling code will wait for this to return a result before it continues
 // this is necessary when we need to get results from multiple data queries (rather than nesting them)
 // and this code could be re-used by other routes 
-function getFundSearchResult(search_text, sort_by) {
-    // console.log('getFundSearchResult: search_text: >' + search_text + '< sort_by: >' + sort_by +'<')
+function getFundSearch(search_text, sort_by) {
+//console.log('getFundSearchResult: search_text: >' + search_text + '< sort_by: >' + sort_by +'<')
     return new Promise((resolve, reject) => {
         let sqlquery = "";
         search_text = '%' + search_text + '%'
         let order = ' ' + sort_by + ' DESC'                         // default is descending order
         if (sort_by === "fee") order = ' fee ASC'                  // except fees which are in ascending order
         sqlquery = "SELECT * FROM funds WHERE name LIKE '" + search_text + "' ORDER BY " + order
-        // console.log('getFundSearchResult: sqlquery: >' + sqlquery + '<')
+//console.log('getFundSearchResult: sqlquery: >' + sqlquery + '<')
         // execute sql query
         db.query(sqlquery, (err, results) => {
             if (err) {
@@ -47,12 +47,38 @@ function getFundSearchResult(search_text, sort_by) {
         });
     });
 }
-  
+
+// getUserPortfolios
+// gets all the fields for the portfolios for the userId that is passed
+// this is used to get the select box options in funds/search-result 
+// this uses a promise, the calling code will wait for this to return a result before it continues
+function getUserPortfolios(userId) {
+// console.log('getUserPortfolios: userId: >' + userId + '<')
+    return new Promise((resolve, reject) => {
+        let sqlquery = "";
+        sqlquery = "SELECT * FROM portfolios WHERE user_id = ?"
+// console.log('getUserPortfolios: sqlquery: >' + sqlquery + '<')
+        // execute sql query
+        db.query(sqlquery,userId, (err, results) => {
+            if (err) {
+                console.error(err.message);
+                reject(err); // if there is an error reject the Promise
+            } else {
+                resolve(results); // the Promise is resolved with the result of the query
+            }
+        });
+    });
+}
 
 router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (req, res, next) {
     // Search the list of available funds
     let loggedInStatus = getLoggedInUser(req)
-    console.log({ test: "search-result-promise", previousData: req.query, messages: req.validationErrors });
+    let search_text = req.query.search_text
+    let sort_by = req.query.sort_by
+    // manage link with no initial parameters (like from the menu)
+    if (typeof search_text === "undefined") search_text = ''
+    if (typeof sort_by === 'undefined') sort_by = 'fee'
+//    console.log({ test: "search-result-promise", previousData: req.query, messages: req.validationErrors });
     if (req.validationErrors) {
         // debug to test data is there
 //        console.log({ success: false, previousData: req.query, messages: req.validationErrors });
@@ -67,19 +93,21 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
     }
     else {
         Promise.all([
-            getFundSearchResult(req.query.search_text, req.query.sort_by)       // Promise.all[0]
+            getFundSearch(search_text, sort_by),                           // Promise.all[0]
+            getUserPortfolios(req.session.userId)                                // Promise.all[1]
         ])
-        .then(([getFundSearchResult]) => {     // if you had more data just add the name of it here first variable is the result of promise.all[0] etc.
+        .then(([getFundSearchResults,getUserPortfolioResults]) => {              // for more query results name them here 1st field is promise.all[0] etc.
             res.render("fundsSearchResults.ejs", {
                 loggedInStatus,
-                funds: getFundSearchResult,
+                funds: getFundSearchResults,
+                portfolios: getUserPortfolioResults,
                 previousData: req.query,
                 messages: [],  // if code here then it's successful and messages is empty
             });
         })
- //       .catch((error) => {
- //           console.log("Error getting data from database calls or in the code above");
- //       });
+        .catch((error) => {
+            console.log("getFundSearch, getUserPortfolio. Error getting data from database calls or in the code above");
+        });
     }
 })
 
