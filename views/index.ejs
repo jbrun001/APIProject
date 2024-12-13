@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <title>Welcome to <%=appData.appName%></title>
-  <link rel="stylesheet"  type="text/css" href="/main.css" />
-</head>
-  <body>
-    <%- include('headerMenu') %>
-    <main class="content">
-      <h1>Welcome to <%=appData.appName%></h1>
-      <p>front: [90%] back: [100%] <a href="about">About <%=appData.appName%></a></p>
-      <p>front: [90%] back: [90%] <a href="portfolios/list">List my portfolios</a></p>
-      <p>front: [100%] back: [90%] <a href="portfolios/add">Add a new portfolio</a></p>
-      <p>front: [100%] back: [90%] <a href="funds/search-result">Find a new fund to invest in</a></p>
-      <p>front: [90%] back: [90%] funds/list - list funds in a portfolio - accessible from porfolios/list</p>
-      <p>front: [75%] back: [75%] transactions/add - adds a transaction to a portfolio</p>
-      <p>front: [90%] back: [40%] <a href="users/register">Register with us</a></p>
-      <p>front: [90%] back: [40%] <a href="users/login">Login</a></p>
-      <p>front: [90%] back: [60%] <a href="users/logout">logout</a></p>  
-      <p>front: [15%] back: [15%] <a href="transactions/list">Required? List transactions</a></p>
-      <p>api price [0%]</p>
-      <p>api price save [0%]</p>
-    </main>
-    <%- include('footerMenu') %>
-  </body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <title>Welcome to <%=appData.appName%></title>
+        <link rel="stylesheet"  type="text/css" href="/main.css" />
+    </head>
+    <body>
+        <%- include('headerMenu') %>
+        <main class="content">
+            <h1>Welcome to <%=appData.appName%></h1>
+            <p>front: [90%] back: [100%] <a href="about">About <%=appData.appName%></a></p>
+            <p>front: [90%] back: [90%] <a href="portfolios/list">List my portfolios</a></p>
+            <p>front: [100%] back: [90%] <a href="portfolios/add">Add a new portfolio</a></p>
+            <p>front: [100%] back: [90%] <a href="funds/search-result">Find a new fund to invest in</a></p>
+            <p>front: [90%] back: [90%] funds/list - list funds in a portfolio - accessible from porfolios/list</p>
+            <p>front: [75%] back: [75%] transactions/add - adds a transaction to a portfolio</p>
+            <p>front: [90%] back: [40%] <a href="users/register">Register with us</a></p>
+            <p>front: [90%] back: [40%] <a href="users/login">Login</a></p>
+            <p>front: [90%] back: [60%] <a href="users/logout">logout</a></p>  
+            <p>front: [15%] back: [15%] <a href="transactions/list">Required? List transactions</a></p>
+            <p>api price [0%]</p>
+            <p>api price save [0%]</p>
+        </main>
+        <%- include('footerMenu') %>
+    </body>
 </html>

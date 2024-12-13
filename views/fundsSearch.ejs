@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <title>Welcome to <%=appData.appName%></title>
-  <link rel="stylesheet"  type="text/css" href="/main.css" />
-</head>
-  <body>
-    <%- include('headerMenu') %>
-      <main class="content">
-        <h1>Search <%=appData.appName%> funds</h1>
-        <form action="search-result" method="GET">
-          <p>Search for a fund by name or part of name?</p>
-          <input id="search_text" type="text" name="search_text" maxlength="100">
-          <input type="submit" value="Search" >
-        </form>
-      </main>
-      <%- include('footerMenu') %>
-  </body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <title>Welcome to <%=appData.appName%></title>
+        <link rel="stylesheet"  type="text/css" href="/main.css" />
+    </head>
+    <body>
+        <%- include('headerMenu') %>
+        <main class="content">
+            <h1>Search <%=appData.appName%> funds</h1>
+            <form action="search-result" method="GET">
+                <p>Search for a fund by name or part of name?</p>
+                <input id="search_text" type="text" name="search_text" maxlength="100">
+                <input type="submit" value="Search" >
+            </form>
+        </main>
+        <%- include('footerMenu') %>
+    </body>
 </html>

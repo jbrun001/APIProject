@@ -8,39 +8,39 @@
         <link rel="stylesheet"  type="text/css" href="/main.css" />
     </head>
     <body>
-          <%- include('headerMenu') %>
-          <main class="content">
-              <div class="main">
-                  <h1>Portfolio: ****portfolio name**** </h1>
-                  <ul class="item-list">
-                      <% funds.forEach(function(fund) { %>
-                      <li class="item">
-                          <div class="item-row">
-                              <div class="item-icon">
-                                  <i class="material-icons">insights</i>
-                              </div>
-                              <div class="item-content">
-                                  <span class="item-name"><%= fund.name %> (<%=fund.ticker%>)</span>
-                                  <span class="item-value">Cost: £<%=fund.total_cost%></span>
-                                  <span class="item-value">Shares: <%=fund.total_shares%></span>
-                              </div>
-                              <div class="item-actions">
-                                  <form action="/transactions/add" method="POST">
-                                      <input type="hidden" name="portfolio_id" value="<%=portfolio_id%>"> 
-                                      <input type="hidden" name="fund_id" value="<%=fund.fund_id%>"> 
-                                      <input type="hidden" name="fund_name" value="<%= fund.name %> (<%=fund.ticker%>)">
-                                      <button type="submit" class="add-btn">Buy/Sell</button>
-                                  </form>
-                              </div>
-                          </div>
-                      </li>
-                      <% }) %>
-                  </ul>
-                  <a href="search" class="fab" id="fab-add">
-                      <i class="material-icons">add</i>
-                  </a>
-                </div>
-          </main>
-            <%- include('footerMenu') %>
+        <%- include('headerMenu') %>
+        <main class="content">
+            <div class="main">
+                <h1>Portfolio: ****portfolio name**** </h1>
+                <ul class="item-list">
+                    <% funds.forEach(function(fund) { %>
+                    <li class="item">
+                        <div class="item-row">
+                            <div class="item-icon">
+                                <i class="material-icons">insights</i>
+                            </div>
+                            <div class="item-content">
+                                <span class="item-name"><%= fund.name %> (<%=fund.ticker%>)</span>
+                                <span class="item-value">Cost: £<%=fund.total_cost%></span>
+                                <span class="item-value">Shares: <%=fund.total_shares%></span>
+                            </div>
+                            <div class="item-actions">
+                                <form action="/transactions/add" method="POST">
+                                    <input type="hidden" name="portfolio_id" value="<%=portfolio_id%>"> 
+                                    <input type="hidden" name="fund_id" value="<%=fund.fund_id%>"> 
+                                    <input type="hidden" name="fund_name" value="<%= fund.name %> (<%=fund.ticker%>)">
+                                    <button type="submit" class="add-btn">Buy/Sell</button>
+                                </form>
+                            </div>
+                        </div>
+                    </li>
+                    <% }) %>
+                </ul>
+                <a href="search" class="fab" id="fab-add">
+                    <i class="material-icons">add</i>
+                </a>
+            </div>
+        </main>
+        <%- include('footerMenu') %>
       </body>
 </html>
