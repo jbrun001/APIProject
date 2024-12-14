@@ -37,58 +37,107 @@ function getLatestPriceData(fund_id) {
     });
 }
 
-
-router.get('/update',redirectLogin,function(req, res, next){
-    let loggedInStatus = getLoggedInUser(req)
-    // need validation and sanitisation here
-    let apiKey = (process.env.API_KEY_ALPHAVANTAGE);
-    let symbol = "VMIG.LON"
-    let fund_id = 50
-    let url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${apiKey}`
-    //let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${apiKey}`
-    request(url, function (err, response, body) {
-        let sqlInserts = []
-//console.log(body)
-        var prices = JSON.parse(body)
-        // validate the response
-        if (prices["Time Series (Daily)"] !==undefined ) {
-            let sqlInserts = []
-            timeSeries = prices["Time Series (Daily)"]
-            Promise.all([
-                getLatestPriceData(fund_id),                                         // Promise.all[0]
-            ])
-            .then(([getLatestPriceDataResult]) => {         
-                // only update records after the latest in the table
-                
-                // testing just update a few the first time
-                let lastDate = '2024-08-01'                                         // default is all records                
-                if (getLatestPriceDataResult.length > 0) {
-                    lastDate = getLatestPriceDataResult[0].price_date
-                }
-                console.log('getLatestPriceDataResult: : >' + getLatestPriceDataResult + '<' + ' lastDate: ' + lastDate)
-
-                // loop through data creating sql statements
-                for (const [price_date, values] of Object.entries(timeSeries)) {
-                    const open = values["1. open"];
-                    const high = values["2. high"];
-                    const low = values["3. low"];
-                    const close = values["4. close"];
-                    const volume = values["5. volume"];
-                    const sql = ''
-                    if (price_date >= lastDate) {                                  // for speed only update records later than the last one
-                        sql = ` 
-                        INSERT INTO prices (fund_id, ticker, price_date, open, high, low, close, volume)
-                        VALUES ('${fund_id}', '${symbol}', '${price_date}', ${open}, ${high}, ${low}, ${close}, ${volume})`;
-                        sqlInserts.push(sql);
+function setPriceData(sqlInserts) {
+    return Promise.all(
+        sqlInserts.map(({ query, params }) => {
+            return new Promise((resolve, reject) => {
+                db.query(query, params, (err, results) => {
+                    if (err) {
+                        console.error('Error executing query:', err.message);
+                        reject(err);
+                    } else {
+                        resolve(results);
                     }
-                }
-                res.render("pricesUpdate.ejs",{sqlInserts,loggedInStatus})
-            })
-//            .catch((error) => {
-//                console.log("getLatestPriceData. Error getting data from database calls or in the code above");
-//            });
-        }    
-    });    
+                });
+            });
+        })
+    );
+}
+
+// formats a javascript date object to YYYY-MM-DD
+function formatDate(date) {
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {  // check if already string YYYY-MM-DD
+        return date 
+    }
+    const year = date.getFullYear() 
+    const month = String(date.getMonth() + 1).padStart(2, '0') 
+    const day = String(date.getDate()).padStart(2, '0') 
+    return `${year}-${month}-${day}` 
+}
+
+router.get('/update', redirectLogin, function (req, res, next) {
+    // Measure start time
+    const startTime = Date.now() 
+    const loggedInStatus = getLoggedInUser(req) 
+    const apiKey = process.env.API_KEY_ALPHAVANTAGE 
+    const symbol = "VMIG.LON" 
+    const fund_id = 50 
+    const url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${apiKey}`
+    // const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${apiKey}`
+
+    request(url, function (err, response, body) {                                    // get data from the API
+        if (err) {
+            console.error('Error fetching API:', err) 
+            res.status(500).send('Error fetching data from API.') 
+            return
+        }
+        const endTimeRequest = Date.now()                                           // measure after API response
+        let sqlInserts = [] 
+        const prices = JSON.parse(body) 
+        
+        if (prices["Time Series (Daily)"] !== undefined) {                          // validate the response - dies it have price data?
+            const timeSeries = prices["Time Series (Daily)"]           
+            Promise.all([getLatestPriceData(fund_id)])                              // get latest data for this fund
+                .then(([getLatestPriceDataResult]) => {
+                    let lastDate = ''                                               // '' gets all records if nothing in prices for this fund
+                    let dbFormattedDate = ''                                          
+                    if (getLatestPriceDataResult.length > 0) {
+                        let dbDate = getLatestPriceDataResult[0].price_date
+                        lastDate = formatDate(dbDate)        
+                    }
+console.log('getLatestPriceDataResult: ', getLatestPriceDataResult, ' lastDate: ', lastDate)
+                    // loop through, create all the insert statements for data needed
+                    for (const [price_date, values] of Object.entries(timeSeries)) {
+                        const open = values["1. open"]
+                        const high = values["2. high"]
+                        const low = values["3. low"]
+                        const close = values["4. close"]
+                        const volume = values["5. volume"]
+                        dbDate = price_date
+                        dbFormattedDate = formatDate(dbDate)
+                        if (dbFormattedDate > lastDate) {                       // only include data not already in prices
+                            const sql = `
+                                INSERT INTO prices (fund_id, ticker, price_date, open, high, low, close, volume)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                ON DUPLICATE KEY UPDATE
+                                    open = VALUES(open),
+                                    high = VALUES(high),
+                                    low = VALUES(low),
+                                    close = VALUES(close),
+                                    volume = VALUES(volume)
+                            `
+                            sqlInserts.push({
+                                query: sql,
+                                params: [fund_id, symbol, dbFormattedDate, open, high, low, close, volume],
+                            })
+                        }
+                    }
+                    return setPriceData(sqlInserts)
+                })
+                .then(() => {
+                    const endTimeSQL = Date.now()                    // measure after SQL execution
+console.log('Timing: Start to having API result:', endTimeRequest - startTime, 'ms, API data to finishing SQL:', endTimeSQL - endTimeRequest, 'ms Number of records that were inserted: ' + sqlInserts.length)
+                    res.render('pricesUpdate.ejs', { sqlInserts, loggedInStatus })
+                })
+                .catch((error) => {
+                    console.error('Error during SQL execution or data preparation:', error)
+                    res.status(500).send('Database update failed.')
+                })
+        } else {
+            console.error('Invalid API response:', prices)
+            res.status(400).send('Invalid API response.')
+        }
+    });
 })
 
 // this is a test route which provides the same format of data as alphvantage

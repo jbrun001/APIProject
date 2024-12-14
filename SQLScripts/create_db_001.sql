@@ -61,7 +61,7 @@ CREATE TABLE users (
 );
 ALTER TABLE users MODIFY id INT AUTO_INCREMENT;
 
-# unqiqe constraint added 
+# unqiqe constraint added to protect against duplicates
 CREATE TABLE prices (
     id INT, 
     fund_id INT,
