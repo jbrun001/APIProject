@@ -1,5 +1,5 @@
 # initial database creation scripts
-# version 1.0   initial scripts and application user   
+# version 1.0   initial scripts and application users  
 # Create database script for the portolio app
 # Create the database
 CREATE DATABASE IF NOT EXISTS portfolio;
@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS funds;
 DROP TABLE IF EXISTS portfolios;
 DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS prices;
 
 CREATE TABLE funds (
     id INT,
@@ -25,7 +26,6 @@ CREATE TABLE funds (
     last_update DATETIME,
     PRIMARY KEY(id)
 );
-
 ALTER TABLE funds MODIFY id INT AUTO_INCREMENT;
 
 CREATE TABLE transactions (
@@ -39,9 +39,7 @@ CREATE TABLE transactions (
     last_update DATETIME,
     PRIMARY KEY(id)
 );
-
 ALTER TABLE transactions MODIFY id INT AUTO_INCREMENT;
-
 
 CREATE TABLE portfolios (
     id INT,
@@ -51,7 +49,6 @@ CREATE TABLE portfolios (
     last_update DATETIME, 
     PRIMARY KEY(id)
 );
-
 ALTER TABLE portfolios MODIFY id INT AUTO_INCREMENT;
 
 CREATE TABLE users (
@@ -62,8 +59,23 @@ CREATE TABLE users (
     last_login DATETIME,
     PRIMARY KEY(id) 
 );
-
 ALTER TABLE users MODIFY id INT AUTO_INCREMENT;
+
+# unqiqe constraint added 
+CREATE TABLE prices (
+    id INT, 
+    fund_id INT,
+    ticker VARCHAR(10) NOT NULL,
+    price_date DATE NOT NULL,
+    open DECIMAL(10,4),
+    high DECIMAL(10,4),
+    low DECIMAL(10,4),
+    close DECIMAL(10,4),
+    volume INT,
+    PRIMARY KEY(id),
+    UNIQUE KEY unique_ticker_price_date (ticker, price_date)
+);
+ALTER TABLE prices MODIFY id INT AUTO_INCREMENT;
 
 
 USE portfolio;

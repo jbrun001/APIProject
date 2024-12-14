@@ -1,6 +1,6 @@
+// funds.js
+// this route manages pages relating to funds
 const express = require("express")
-const { body, validationResult } = require('express-validator');
-const bcrypt = require('bcrypt')
 const router = express.Router()
 const { validateAndSanitiseFunds } = require('../middleware/validateAndSanitiseInput');
 const { getLoggedInUser } = require('../helpers/getLoggedInUser');
@@ -30,10 +30,13 @@ router.get('/search',redirectLogin,function(req, res, next){
 function getFundSearch(search_text, sort_by) {
 //console.log('getFundSearchResult: search_text: >' + search_text + '< sort_by: >' + sort_by +'<')
     return new Promise((resolve, reject) => {
+        // manage default parameters (like if being called from the menu)
+        if (typeof search_text === "undefined") search_text = ''
+        if (typeof sort_by === 'undefined') sort_by = 'fee'
         let sqlquery = "";
         search_text = '%' + search_text + '%'
-        let order = ' ' + sort_by + ' DESC'                         // default is descending order
-        if (sort_by === "fee") order = ' fee ASC'                  // except fees which are in ascending order
+        let order = ' ' + sort_by + ' DESC'                 // default is descending order
+        if (sort_by === "fee") order = ' fee ASC'           // except fees which are in ascending order
         sqlquery = "SELECT * FROM funds WHERE name LIKE '" + search_text + "' ORDER BY " + order
 //console.log('getFundSearchResult: sqlquery: >' + sqlquery + '<')
         // execute sql query
@@ -75,9 +78,6 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
     let loggedInStatus = getLoggedInUser(req)
     let search_text = req.query.search_text
     let sort_by = req.query.sort_by
-    // manage link with no initial parameters (like from the menu)
-    if (typeof search_text === "undefined") search_text = ''
-    if (typeof sort_by === 'undefined') sort_by = 'fee'
 //    console.log({ test: "search-result-promise", previousData: req.query, messages: req.validationErrors });
     if (req.validationErrors) {
         // debug to test data is there
@@ -123,7 +123,7 @@ router.post('/list',validateAndSanitiseFunds, redirectLogin, function(req, res, 
                     GROUP BY transactions.fund_id, funds.name 
                     ORDER BY funds.name` 
     // execute sql query
-    db.query(sqlquery,[req.body.portfolio_id, req.session.userId, req.body.portfolio_id], (err, result) => {
+    db.query(sqlquery,[req.session.userId, req.body.portfolio_id], (err, result) => {
         if (err) {
             next(err)
         }

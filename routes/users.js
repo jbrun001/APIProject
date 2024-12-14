@@ -1,9 +1,7 @@
 // Create a new router
 const express = require("express")
-const { check, validationResult } = require('express-validator');
 const { validateAndSanitiseUsers } = require('../middleware/validateAndSanitiseInput');
 const { getLoggedInUser } = require('../helpers/getLoggedInUser');
-
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 

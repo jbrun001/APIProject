@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <title>Welcome to <%=appData.appName%></title>
+        <link rel="stylesheet"  type="text/css" href="/main.css" />
+    </head>
+    <body>
+        <%- include('headerMenu') %>
+        <main class="content">
+            <div class="main">
+                <h1>Insert Statement Testing</h1>
+                <ul class="item-list">
+                    <% sqlInserts.forEach(function(sqlInsert) { %>
+                        <li class="item">
+                            <div class="item-row">
+                                <div class="item-icon">
+                                    <i class="material-icons">update</i>
+                                </div>
+                                <div class="item-content">
+                                    <span class="item-name"><%=sqlInsert%></span>
+                                  </div>
+                            </div>
+                        </li>
+                    <% }) %>
+                </ul>     
+            </div>
+        </main>
+        <%- include('footerMenu') %>
+    </body>
+</html>

@@ -45,7 +45,7 @@ router.post('/add', redirectLogin, function (req, res, next) {
 
 router.post('/added', validateAndSanitiseTransactions, redirectLogin, function (req, res, next) {
     // check if validation errors and if yes then re-display page with old data and error messages
-//    console.log({ success: "testing", previousData: req.body, messages: req.validationErrors });
+console.log({ testing: "transaction/added", previousData: req.body, messages: req.validationErrors, session: req.session });
     let loggedInStatus = getLoggedInUser(req)
     if (req.validationErrors) {
         // debug to test data is there

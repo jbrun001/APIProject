@@ -105,6 +105,10 @@ app.use('/transactions', transactionsRoutes)
 const fundsRoutes = require('./routes/funds')
 app.use('/funds', fundsRoutes)
 
+// Load the route handlers for /prices
+const pricesRoutes = require('./routes/prices')
+app.use('/prices', pricesRoutes)
+
 // security. custom 404 so default will not give away we are using express
 app.use((req, res, next) => {
   res.status(404).send("That resouce cannot be found")
