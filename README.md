@@ -23,7 +23,7 @@ gantt
     Project delay (Focus on FYP) :done,    delay1, after d3, 9d
     Code Application API      :active,    dd3a, after delay1, 6d
     Seurity changes and testing :  d4, after dd3a, 2d
-    styling                   :    d6, after dd3a, 4d
+    styling                   : done,   d6, after dd3a, 4d
     development contingency           :until doccomplete
 
     section Documentation
