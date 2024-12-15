@@ -1,0 +1,47 @@
+@startgantt
+project starts the 2024-11-03
+sunday are closed
+2024-12-21 to 2024-12-27 is closed
+today is colored in pink
+
+
+title API Project Gantt
+
+-- Deadlines --
+[Submission]               happens at 2025-01-08                    and lasts 0 days
+[Documentation Complete]   happens at 2024-12-20                    and lasts 0 days
+
+-- Research & Design --
+[Choose idea]               starts the 2024-11-04                   and ends at 2024-11-08    and is 100% completed
+[Research APIs]             starts at [Choose idea]'s end           and lasts 2 days    and is 100% completed
+[UI flow design]            starts at [Research APIs]'s end         and lasts 2 days    and is 100% completed
+[Database design & script]  starts at [Research APIs]'s end         and lasts 2 days    and is 100% completed
+[Security checklist]        starts at [UI flow design]'s end        and lasts 1 day     and is 100% completed
+[Check rubric]              starts at [UI flow design]'s end        and lasts 1 day     and is 100% completed
+[Test Assumptions]          starts at [Check rubric]'s end          and lasts 5 days    and is 100% completed
+
+-- Development --
+[Set up git]                starts at [Test Assumptions]'s end      and lasts 1 day     and is 100% completed
+[Deploy Database]           starts at [Set up git]'s end            and lasts 1 day     and is 100% completed
+[Code New Interfaces]       starts at [Deploy Database]'s end       and lasts 4 days    and is 100% completed
+[Project delay (FYP)]       starts at [Code New Interfaces]'s end   and lasts 10 days   and is 100% completed 
+[Code API]                  starts at [Project delay (FYP)]'s end   and lasts 7 days    and is 50% completed
+[Styling]                   starts at [Code API]'s end              and lasts 2 days    and is 100% completed
+[Security Changes]          starts at [Code API]'s end              and lasts 1 days    and is 50% completed
+[Testing]                   starts at [Security Changes]'s end      and lasts 1 days
+[Contingency]               starts at [Security Changes]'s end              and ends at [Submission]'s end
+[Project delay (FYP)]       is colored in red
+
+-- Documentation --
+[Start Documentation]       starts at [Choose idea]'s end           and lasts 1 day     and is 100% completed   
+[Draft Doc in .md]          starts at [Start Documentation]'s end   and ends at [Security Changes]'s end 
+[Start Final Doc]           starts at [Security Changes]'s end      and lasts 1 day
+[Finalise]                  starts at [Start Final Doc]'s end       and ends at [Documentation Complete]'s end  
+
+-- Milestones --
+[Research & Design]         happens at [Test Assumptions]'s end       
+[Test Deployment]           happens at [Code New Interfaces]'s end  and lasts 0 days
+[Development Complete]      happens at [Testing]'s end              and lasts 1 days
+[Final Deployment]          happens at [Security Changes]'s end     and lasts 2 day
+
+@endgantt
