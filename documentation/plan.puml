@@ -25,9 +25,9 @@ title API Project Gantt
 [Deploy Database]           starts at [Set up git]'s end            and lasts 1 day     and is 100% completed
 [Code New Interfaces]       starts at [Deploy Database]'s end       and lasts 4 days    and is 100% completed
 [Project delay (FYP)]       starts at [Code New Interfaces]'s end   and lasts 10 days   and is 100% completed 
-[Code API]                  starts at [Project delay (FYP)]'s end   and lasts 7 days    and is 50% completed
+[Code API]                  starts at [Project delay (FYP)]'s end   and lasts 7 days    and is 70% completed
 [Styling]                   starts at [Code API]'s end              and lasts 2 days    and is 100% completed
-[Security Changes]          starts at [Code API]'s end              and lasts 1 days    and is 50% completed
+[Security Changes]          starts at [Code API]'s end              and lasts 1 days    and is 70% completed
 [Testing]                   starts at [Security Changes]'s end      and lasts 1 days
 [Contingency]               starts at [Security Changes]'s end              and ends at [Submission]'s end
 [Project delay (FYP)]       is colored in red
