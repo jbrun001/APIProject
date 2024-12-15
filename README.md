@@ -44,66 +44,14 @@ gantt
 ```
 
 
-## draft data structure
 
-```mermaid
----
-config:
-  look: handDrawn
-  theme: base
----
-erDiagram
-    portfolios {
-        id INT PK 
-        user_id INT FK
-        name VARCHAR(100)
-        value DECIMAL
-        last_update DATETIME
-    }
-    transactions {
-        id INT PK
-        user_id INT FK
-        fund_id INT FK
-        portfolio_id INT FK
-        volume DECIMAL
-        date DATETIME
-        share_price DECIMAL
-        last_update DATETIME
-    }
-    funds {
-        id INT PK
-        holder VARCHAR(100)
-        name VARCHAR(100)
-        size DECIMAL
-        fee DECIMAL
-        distribution VARCHAR(20)
-        holdings DECIMAL
-        dividend_yield DECIMAL
-        isin VARCHAR(15)
-        ticker VARCHAR(10)
-        last_updated DATETIME
-    }
-    users {
-        id INT PK
-        email VARCHAR(100)
-        pwhash VARCHAR(200)
-        type VARCHAR(10)
-        last_login DATETIME
-    }
 
-    transactions }|--|| funds : "on fund_id"
-    transactions }|--|| portfolios : "on portfolio_id"
-    transactions }|--|| users : "on user_id"
-    portfolios }|--|| users : "on user_id"
-
-```
 
 ## draft UI flow v1.0
 
 ```mermaid
 ---
 config:
-  look: handDrawn
   theme: base
 ---
 flowchart
@@ -184,25 +132,79 @@ My application is a stock portfolio reporting system.
 ## Links and Logins
 `Links and logins: URL of your deployed, running app; Link to your Github repo; Username / password`
 
-## Architecture [100 max] 
+## Architecture [100 max] [actual 92 words]
 `A high-level architecture including a diagram and description (max 100 words) describing what technologies and components you have used in your application tier and data tier`
+The application is a Node.js application, hosted on the Goldsmiths servers. Registered and Public Users interact via HTTPS requests routed through an Apache Web Server, which forwards them to the Node.js Application Layer. The application comprises Routing (Express), Middleware (e.g., express-session, express-validator, express-rate-limit), Controllers for business logic, and Views (EJS) for rendering templates. It handles public API requests, and calls the AlphaVantage public API to obtain fund price data. MySQL is used to store data. dotenv manages environment configuration for loading of sensitive data like API keys, session details and database credentials.
 
-- Node.js, 
-- express, 
-- ejs, 
-- bcrypt, 
-- css - material from google?
-- Hosting, 
-- web server (apache?) 
-- mysql
+plantUML: architecturediagram.puml
 
 ## Data Model [100]
 `A data model including a diagram and description (max 100 words)`
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: base
+---
+erDiagram
+    portfolios {
+        id INT PK 
+        user_id INT FK
+        name VARCHAR(100)
+        value DECIMAL
+        last_update DATETIME
+    }
+    transactions {
+        id INT PK
+        user_id INT FK
+        fund_id INT FK
+        portfolio_id INT FK
+        volume DECIMAL
+        date DATETIME
+        share_price DECIMAL
+        last_update DATETIME
+    }
+    funds {
+        id INT PK
+        holder VARCHAR(100)
+        name VARCHAR(100)
+        size DECIMAL
+        fee DECIMAL
+        distribution VARCHAR(20)
+        holdings DECIMAL
+        dividend_yield DECIMAL
+        isin VARCHAR(15)
+        ticker VARCHAR(10)
+        last_updated DATETIME
+    }
+    users {
+        id INT PK
+        email VARCHAR(100)
+        pwhash VARCHAR(200)
+        type VARCHAR(10)
+        last_login DATETIME
+    }
+    prices {
+        id INT PK
+        fund_id INT FK
+        ticker VARCHAR(10) NOT NULL
+        price_date DATE NOT NULL
+        open DECIMAL
+        high DECIMAL
+        low DECIMAL
+        close DECIMAL
+        volume INT
+    }
 
-- User
-- Fund
-- Transaction
-- Portfolio
+    prices }|--o| funds : "on fund_id"
+    transactions }|--o| funds : "on fund_id"
+    transactions }|--o| portfolios : "on portfolio_id"
+    transactions }|--o| users : "on user_id"
+    portfolios }|--o| users : "on user_id"
+
+```
+
+
 
 ## User Functionality [500 words max]
 `A description of the user-facing functionality of your application, adding screenshots to help explain (max 500 words)`

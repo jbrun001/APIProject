@@ -1,0 +1,48 @@
+@startuml
+!define ComponentStyle rect
+
+actor "Registered User" as RegisteredUser
+actor "Public User" as PublicUser
+cloud "AlphaVantage API" as AlphaVantage
+
+rectangle "Web Server Layer" {
+    node "Apache Web Server" as Apache
+}
+
+rectangle "Application Layer" {
+    node "Node.js Application" as NodeApp {
+        component "Routing\n(Express)" as Routing
+        component "Middleware" {
+            component "express-session\nexpress-validator\nexpress-rate-limit\n" as MiddlewareComponents
+        }
+        component "Views\n(EJS)" as Views
+        component "/users, /portfolios, /funds, \n/transactions, /prices, /api" as Controllers
+        component "External API Request\n(request)" as AlphaVantageClient
+        component "Environment Configuration\n(dotenv)" as Dotenv
+    }
+}
+
+rectangle "Data Layer" {
+    database "RDMBS\n(MySQL)" as MySQL
+}
+
+' User interactions
+RegisteredUser --> Apache : "Browser HTTPS Request"
+PublicUser --> Apache : "API HTTPS Request"
+
+' Web Server interactions
+Apache --> NodeApp
+
+' Application interactions
+NodeApp --> Routing : "Route Request"
+Routing --> Controllers : "Invoke Business Logic"
+Controllers --> MiddlewareComponents : "Validate Request"
+Controllers --> Views : "Render Template (EJS)"
+Controllers --> AlphaVantageClient : "/prices/update"
+Controllers --> MySQL : "Query Data"
+Dotenv --> NodeApp : "Load Environment Variables"
+
+' External API interaction
+AlphaVantageClient --> AlphaVantage : "Get Time Series"
+
+@enduml
