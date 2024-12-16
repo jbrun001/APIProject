@@ -19,13 +19,11 @@ const sanitiseInputs = require('../middleware/sanitiseInputs');
 const validateAndSanitiseFunds = [
     query('search_text')
         .optional()
-        .isLength({ min: 3 })
-        .withMessage('Search text must be greater than 3 characters')
+        .isLength({ min: 3 }).withMessage('Search text must be greater than 3 characters')
         .trim(),
     query('sort_by')
         .optional()
-        .isIn(['size', 'fee', 'dividend_yield'])
-        .withMessage('Incorrect sorting field')
+        .isIn(['size', 'fee', 'dividend_yield']).withMessage('Incorrect sorting field')
         .trim(),
     sanitiseInputs,
     (req, res, next) => {
@@ -49,8 +47,7 @@ const validateAndSanitiseFunds = [
 const validateAndSanitisePortfolios = [
     body('name')
         .optional() // only validate if the field exists
-        .isLength({ min: 3 })
-        .withMessage('Portfolio name must be at least 3 characters long.')
+        .isLength({ min: 3 }).withMessage('Portfolio name must be at least 3 characters long.')
         .trim(),
     sanitiseInputs,
     (req, res, next) => {
@@ -74,27 +71,20 @@ const validateAndSanitisePortfolios = [
 const validateAndSanitiseUsers = [
     body('email')
         .optional() // Only validate if the field exists
-        .isEmail()
-        .withMessage('Please provide a valid email address')
+        .isEmail().withMessage('Please provide a valid email address')
         .trim(),
     body('password')
         .optional() 
-        .isLength({ min: 9 })
-        .withMessage('Password must be at least 9 characters long')
-        .matches(/[A-Z]/)
-        .withMessage('Password must contain at least one uppercase letter')
-        .matches(/[a-z]/)
-        .withMessage('Password must contain at least one lowercase letter')
-        .matches(/[0-9]/)
-        .withMessage('Password must contain at least one number')
-        .matches(/[\W_]/)
-        .withMessage('Password must contain at least one special character')
+        .isLength({ min: 9 }).withMessage('Password must be at least 9 characters long')
+        .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
+        .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
+        .matches(/[0-9]/).withMessage('Password must contain at least one number')
+        .matches(/[\W_]/).withMessage('Password must contain at least one special character')
         // because we are not sanitising the plain password we have to make sure
         // that it doesn't contain any characters that could be used for
         // sql injection attacks
         .not()
-        .matches(/['";\-#]/)
-        .withMessage('Password cannot contain \' \" ; -- or #' ),
+        .matches(/['";\-#]/).withMessage('Password cannot contain \' \" ; -- or #' ),
     sanitiseInputs,
     (req, res, next) => {
         // validate and build an array of fields that failed validation and why they failed
@@ -116,34 +106,28 @@ const validateAndSanitiseUsers = [
 
 const validateAndSanitiseTransactions = [
     body('fund_id')
-        .optional() // Only validate if the field exists
-        .isInt()
-        .withMessage('fund id must be an integer')
+        .optional() // only validate if the field exists
+        .isInt().withMessage('fund id must be an integer')
         .trim(),
     body('portfolio_id')
         .optional() 
-        .isInt()
-        .withMessage('portfolio id must be an integer')
+        .isInt().withMessage('portfolio id must be an integer')
         .trim(),
     body('volume')
         .optional() 
-        .isFloat()
-        .withMessage('volume must be a float')
+        .isFloat().withMessage('volume must be a float')
         .trim(),
     body('share_price')
         .optional() 
-        .isFloat()
-        .withMessage('price must be a float')
+        .isFloat().withMessage('price must be a float')
         .trim(),
     body('transaction_date')
         .optional()
-        .isISO8601()
-        .withMessage('the date must be valid')
+        .isISO8601().withMessage('the date must be valid')
         .trim(),
     body('transaction_id')
         .optional() 
-        .isFloat()
-        .withMessage('price must be a float')
+        .isFloat().withMessage('price must be a float')
         .trim(),
 
     sanitiseInputs,
@@ -165,9 +149,35 @@ const validateAndSanitiseTransactions = [
     },
 ];
 
+const validateAndSanitisePrices = [
+    query('ticker')
+        .optional()
+        .isLength({ min: 3 }).withMessage('ticker must be at least 3 characters')
+        .trim(),
+    sanitiseInputs,
+    (req, res, next) => {
+        // validate and build an array of fields that failed validation and why they failed
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            req.validationErrors = [];
+            errors.array().forEach(function(error) {
+                req.validationErrors.push({
+                    field: error.path,      // the field that failed validation
+                    message: error.msg,     // the validation message
+                });
+            });
+        } else {
+            req.validationErrors = null; // if there are no errors
+        }
+        next();
+    },
+];
+
+
 module.exports = {
   validateAndSanitiseFunds,
   validateAndSanitisePortfolios,
   validateAndSanitiseUsers,
   validateAndSanitiseTransactions,
+  validateAndSanitisePrices
 };

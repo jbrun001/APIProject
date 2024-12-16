@@ -13,7 +13,7 @@ const rateLimit = require('express-rate-limit');
 const loginRateLimiter = rateLimit({
     windowMs: 1 * 60 * 1000,            // 1 minute before retry
     max: 5,                             // limit each IP to 5 login attempts per minute
-    message: 'Too many login attempts, please try again after a minute.'
+    message: "{error:'Rate Limited', message: 'Too many login attempts, please try again after 1 minute.'}"
 });
 
 // get the start of the URL from index.js

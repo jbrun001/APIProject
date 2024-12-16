@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: Funds API
+  description: API to fetch a list of funds and their associated details.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/funds:
+    get:
+      summary: Retrieve all funds
+      description: Fetch a list of all available funds with their associated details.
+      responses:
+        '200':
+          description: A JSON array of funds.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 49
+                    holder:
+                      type: string
+                      example: ""
+                    name:
+                      type: string
+                      example: "Vanguard FTSE 250 UCITS ETF (GBP) Accumulating"
+                    size:
+                      type: string
+                      format: decimal
+                      example: "755000000.00"
+                    fee:
+                      type: string
+                      format: decimal
+                      example: "0.00100"
+                    distribution:
+                      type: string
+                      example: "Accumulating"
+                    holdings:
+                      type: string
+                      format: decimal
+                      example: "252.00"
+                    dividend_yield:
+                      type: string
+                      nullable: true
+                      example: null
+                    isin:
+                      type: string
+                      example: "IE00BFMXVQ44"
+                    ticker:
+                      type: string
+                      example: "VMIG.LON"
+                    last_update:
+                      type: string
+                      format: date-time
+                      example: "2024-12-15T00:00:00.000Z"
+                    last_price:
+                      type: string
+                      format: decimal
+                      example: "37.38000"
