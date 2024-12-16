@@ -23,6 +23,7 @@
                                 <span class="item-name"><%= fund.name %> (<%=fund.ticker%>)</span>
                                 <span class="item-value">Cost: £<%=fund.total_cost%></span>
                                 <span class="item-value">Shares: <%=fund.total_shares%></span>
+                                <span class="item-value">Current Value: £<%=fund.current_value%></span>
                             </div>
                             <div class="item-actions">
                                 <form action="/transactions/add" method="POST">

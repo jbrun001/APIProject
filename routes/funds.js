@@ -37,7 +37,8 @@ function getFundSearch(search_text, sort_by) {
         search_text = '%' + search_text + '%'
         let order = ' ' + sort_by + ' DESC'                 // default is descending order
         if (sort_by === "fee") order = ' fee ASC'           // except fees which are in ascending order
-        sqlquery = "SELECT * FROM funds WHERE name LIKE '" + search_text + "' ORDER BY " + order
+        sqlquery = "SELECT * FROM funds WHERE "
+        sqlquery = sqlquery + "name LIKE '" + search_text + "' ORDER BY " + order
 //console.log('getFundSearchResult: sqlquery: >' + sqlquery + '<')
         // execute sql query
         db.query(sqlquery, (err, results) => {
@@ -114,14 +115,15 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
 router.post('/list',validateAndSanitiseFunds, redirectLogin, function(req, res, next) {
     let loggedInStatus = getLoggedInUser(req)
     // group transactions to get list of funds in this portfolio
-    let sqlquery = `SELECT transactions.fund_id as fund_id, funds.ticker, funds.name, 
-                    	SUM(transactions.volume * transactions.share_price) AS total_cost, 
-                        SUM(transactions.volume) AS total_shares,
-                        MAX(transactions.transaction_date) AS last_transaction
+    let sqlquery = `SELECT transactions.fund_id as fund_id, funds.ticker, funds.name, FORMAT(funds.last_price,2),
+                    	FORMAT(SUM(transactions.volume * transactions.share_price),2) AS total_cost, 
+                        FORMAT(SUM(transactions.volume),2) AS total_shares,
+                        MAX(transactions.transaction_date) AS last_transaction,
+                        FORMAT(SUM(transactions.volume * funds.last_price),2) AS current_value
                     FROM transactions JOIN funds ON transactions.fund_id = funds.id 
                     WHERE transactions.user_id = ? AND transactions.portfolio_id = ?
                     GROUP BY transactions.fund_id, funds.name 
-                    ORDER BY funds.name` 
+                    ORDER BY funds.name`
     // execute sql query
     db.query(sqlquery,[req.session.userId, req.body.portfolio_id], (err, result) => {
         if (err) {

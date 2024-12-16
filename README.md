@@ -175,6 +175,7 @@ erDiagram
         dividend_yield DECIMAL
         isin VARCHAR(15)
         ticker VARCHAR(10)
+        last_price DECIMAL
         last_updated DATETIME
     }
     users {

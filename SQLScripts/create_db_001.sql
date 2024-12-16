@@ -23,6 +23,7 @@ CREATE TABLE funds (
     dividend_yield DECIMAL(10, 5),
     isin VARCHAR(15),
     ticker VARCHAR(10),
+    last_price DECIMAL(10, 5),
     last_update DATETIME,
     PRIMARY KEY(id)
 );

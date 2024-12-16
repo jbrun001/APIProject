@@ -75,7 +75,16 @@ function formatDate(date) {
 function setFundLastUpdate(fund_id) {
     return new Promise((resolve, reject) => {
         const currentDate = formatDate(new Date())
-        const sql = "UPDATE funds SET last_update = curdate() WHERE id = ?"
+        // updates the last_update and the last_price fields - last price could be calculated from prices 
+        // every time it is needed but the sql would be very complicated and it is needed in multiple places
+        // so it's simpler, and more efficient to update it here. It will only change when new data is 
+        // retrieved from the external API
+        const sql = `
+            UPDATE funds 
+            SET last_update = curdate(), 
+                last_price = (SELECT close FROM prices WHERE prices.fund_id = funds.id 
+                ORDER BY price_date DESC LIMIT 1) 
+            WHERE id = ?`
         db.query(sql, [fund_id], (err, results) => {
             if (err) {
                 console.error('Error executing query:', err.message);
@@ -182,7 +191,13 @@ router.get('/update', redirectLogin, function (req, res, next) {
 
         if (result.length === 0) {
             console.log('No funds require updating.');
-            return res.render('pricesUpdate.ejs', { sqlInserts: [], loggedInStatus });
+            return res.render('pricesUpdate.ejs', 
+                {updateResults:[
+                    {fund_id : '', 
+                    ticker : '',
+                    error : 'All prices have been updated today, no API calls were made', 
+                    sqlInsert : []}], 
+                loggedInStatus });
         }
 
         const updatePromises = result.map((row) => {
@@ -215,9 +230,8 @@ router.get('/update', redirectLogin, function (req, res, next) {
                     console.log(`Updated Fund ID: ${result.fund_id}, Ticker: ${result.ticker}, Records Inserted: ${result.sqlInserts.length}`)
                 }
             })
-
             // Render the results
-            res.render('pricesUpdate.ejs', { sqlInserts:updateResults, loggedInStatus })
+            res.render('pricesUpdate.ejs', {updateResults, loggedInStatus })
         })
         .catch((error) => {
             console.error('Error during fund updates:', error.message)

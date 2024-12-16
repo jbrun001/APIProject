@@ -21,9 +21,9 @@
                                 </div>
                                 <div class="item-content">
                                     <span class="item-name">(#<%=transaction.id%>) <%= transaction.portfolio_name %><br><%= transaction.fund_name %></span>
-                                    <span class="item-value">Date: <%= transaction.transaction_date %></span>
-                                    <span class="item-value">Amount: <%= transaction.volume %></span>
-                                    <span class="item-value">Share Price: <%= transaction.share_price %></span>
+                                    <span class="item-value">Date: <%= new Date(transaction.transaction_date).toISOString().split('T')[0] %></span>
+                                    <span class="item-value">Amount: <%= new Intl.NumberFormat('en-GB', { minimumFractionDigits: 0 }).format(transaction.volume)%></span>
+                                    <span class="item-value">Share Price: <%= new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(transaction.share_price)%></span>
                                   </div>
                                 <div class="item-actions">
                                      <form action="/transactions/remove" method="POST">
