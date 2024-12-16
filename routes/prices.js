@@ -85,15 +85,15 @@ function setFundLastUpdate(fund_id) {
 function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
     return new Promise((resolve, reject) => {
         const apiKey = process.env.API_KEY_ALPHAVANTAGE 
-        const url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`;
-        // const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`       
+        // const url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`;
+        const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`       
         request(url, (err, response, body) => {                                             // get the data from the API
             if (err) {
                 return reject(new Error('Error fetching data from API: ' + err))
             }
             const prices = JSON.parse(body)
             if (prices["Time Series (Daily)"] === undefined) {
-                return reject(new Error('Invalid API response: No Time Series data'))
+                return reject(new Error('Invalid API response: No Time Series data. API limit has been reached. If this has happened the price data is already the latest price data'))
             }
             const timeSeries = prices["Time Series (Daily)"]
             const sqlInserts = []
