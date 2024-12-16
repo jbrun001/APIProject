@@ -111,11 +111,6 @@ function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
                     const sql = `
                         INSERT INTO prices (fund_id, ticker, price_date, open, high, low, close, volume)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                            open = VALUES(open),
-                            high = VALUES(high),
-                            low = VALUES(low),
-                            close = VALUES(close),
-                            volume = VALUES(volume)
                     `
                     sqlInserts.push({
                         query: sql,
