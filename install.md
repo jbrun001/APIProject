@@ -40,7 +40,9 @@ use nano to create .env file (contains security details so not synced with git)
 
 `sudo mysql`
 
-`mysql> source ./SQLScripts/create_db.sql`
+`mysql> source ./SQLScripts/create_db_001.sql`
+
+`mysql> source ./SQLScripts/insert_db_001.sql`
 
 `mysql> quit`
 
