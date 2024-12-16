@@ -21,7 +21,7 @@ router.get('/list', validateAndSanitiseTransactions, redirectLogin,function(req,
                     JOIN funds ON transactions.fund_id = funds.id
                     JOIN portfolios ON transactions.portfolio_id = portfolios.id 
                     WHERE transactions.user_id = ?
-                    ORDER BY transactions.transaction_date DESC` 
+                    ORDER BY transactions.id DESC` 
     // execute sql query
     db.query(sqlquery, [req.session.userId],(err, result) => {
         if (err) {

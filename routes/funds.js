@@ -129,7 +129,7 @@ router.post('/list',validateAndSanitiseFunds, redirectLogin, function(req, res, 
         if (err) {
             next(err)
         }
-        res.render("fundsList.ejs", {loggedInStatus, portfolio_id:req.body.portfolio_id, funds:result})
+        res.render("fundsList.ejs", {loggedInStatus, portfolio_id:req.body.portfolio_id, portfolio_name:req.body.portfolio_name, funds:result})
      })
 })
 

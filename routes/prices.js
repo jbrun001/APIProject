@@ -14,28 +14,6 @@ const redirectLogin = (req, res, next) => {
     } 
 }
 
-// getLatestPriceData
-// gets the most recent price record for a fund
-// this is used in multiple routes 
-// this uses a promise, the calling code will wait for this to return a result before it continues
-function getLatestPriceData(fund_id) {  
-    console.log('getLatestPriceData: fund_id: >' + fund_id + '<')
-    return new Promise((resolve, reject) => {
-        let sqlquery = "";
-        sqlquery = "SELECT * FROM prices WHERE fund_id = ? ORDER BY price_date DESC LIMIT 1"
-// console.log('getLatestPriceData: sqlquery: >' + sqlquery + '<')
-        // execute sql query
-        db.query(sqlquery,fund_id, (err, results) => {
-            if (err) {
-                console.error(err.message)
-                reject(err) // if there is an error reject the Promise
-            } else {
-                resolve(results) // the Promise is resolved with the result of the query
-            }
-        })
-    })
-};
-
 // setAPIPriceData
 // this executes all of sql statements in the object passed
 // the object contains the query and the parameters to be
@@ -133,7 +111,6 @@ function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
                     const sql = `
                         INSERT INTO prices (fund_id, ticker, price_date, open, high, low, close, volume)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                        ON DUPLICATE KEY UPDATE
                             open = VALUES(open),
                             high = VALUES(high),
                             low = VALUES(low),
