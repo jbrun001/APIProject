@@ -20,6 +20,7 @@ const validateAndSanitiseFunds = [
     query('search_text')
         .optional()
         .isLength({ min: 3 }).withMessage('Search text must be greater than 3 characters')
+        .isAlphanumeric('en-US', { ignore: ' ' }).withMessage('Search text must be alphanumeric')
         .trim(),
     query('sort_by')
         .optional()
@@ -153,6 +154,7 @@ const validateAndSanitisePrices = [
     query('ticker')
         .optional()
         .isLength({ min: 3 }).withMessage('ticker must be at least 3 characters')
+        .isAlphanumeric('en-US', { ignore: '.' }).withMessage('ticker must be alphanumeric but can include .')
         .trim(),
     sanitiseInputs,
     (req, res, next) => {
