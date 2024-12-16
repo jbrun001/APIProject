@@ -21,8 +21,8 @@ gantt
     Deploy database          :done,    d2, after d1, 1d
     Code New interfaces       :done,    d3, after d2, 4d
     Project delay (Focus on FYP) :done,    delay1, after d3, 9d
-    Code Application API      :active,    dd3a, after delay1, 6d
-    Seurity changes and testing :  d4, after dd3a, 2d
+    Code Application API      :done,    dd3a, after delay1, 6d
+    Seurity changes and testing : active, d4, after dd3a, 2d
     styling                   : done,   d6, after dd3a, 4d
     development contingency           :until doccomplete
 
