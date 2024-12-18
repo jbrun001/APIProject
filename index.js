@@ -29,8 +29,7 @@ app.use(express.static(__dirname + '/public'))
 
 // Security if we are in developement dont use https for the cookies
 // but if we are live then use https for the cookies
-let cookieSecure = true
-let httpOnly = true
+let cookieSecure = false
 const url = new URL(ORIGIN_URL);
 const cookieDomain = url.hostname;    // extracts the domain 
 let cookiePath = url.pathname;        // extracts the path 
