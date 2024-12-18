@@ -50,8 +50,8 @@ app.use(session({
     cookie: {
           secure: cookieSecure,               // force https when on live server but not in development
           httpOnly: true,                     // cookie can't be set by javascript
-          domain: cookieDomain,               // restricts cookie sending to just this domain
-          path: cookiePath,                   // restricts cookie sending to just the part of the path that has the routes
+//          domain: cookieDomain,               // restricts cookie sending to just this domain
+//          path: cookiePath,                   // restricts cookie sending to just the part of the path that has the routes
           expires: 600000                     // 10 mins before re-login is this too short?
     }
 }))
