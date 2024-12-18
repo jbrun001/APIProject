@@ -30,6 +30,7 @@
                     <label for="share_price">Share Price:</label>
                     <input type="number" step="any" id="share_price" name="share_price" value="<%= previousData.share_price || '' %>" required>
                 </div>
+                <input type="hidden" name="_csrf" value="<%= crsfToken %>">
                 <button type="submit" class="submit-button">Add Transaction</button>
                 <% if (messages.length > 0) { %>
                     <ul>

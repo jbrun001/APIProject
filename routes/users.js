@@ -67,15 +67,18 @@ router.post('/registered', validateAndSanitiseUsers, function (req, res, next) {
 })
 
 router.get('/list',redirectLogin, function(req, res, next) {
-    let sqlquery = "SELECT * FROM users" // query database to get all the users
-    // execute sql query
-    db.query(sqlquery, (err, result) => {
-        if (err) {
-            next(err)
-        }
-        let loggedInStatus = getLoggedInUser(req)
-        res.render("userList.ejs", {userList:result,loggedInStatus})
-    })
+    if (req.session.userType == 'admin') {
+        let sqlquery = "SELECT * FROM users" // query database to get all the users
+        // execute sql query
+        db.query(sqlquery, (err, result) => {
+            if (err) {
+                next(err)
+            }
+            let loggedInStatus = getLoggedInUser(req)
+            res.render("userList.ejs", {userList:result,loggedInStatus})
+        })
+    }
+    else res.redirect(ORIGIN_URL+"/")
 })
 
 router.get('/login', function(req, res, next) {

@@ -28,6 +28,7 @@
                                 <div class="item-actions">
                                      <form action="/transactions/remove" method="POST">
                                         <input type="hidden" name="transaction_id" value="<%=transaction.id%>"> 
+                                        <input type="hidden" name="_csrf" value="<%= crsfToken %>">
                                         <button type="submit" class="delete-btn"><i class="material-icons">delete</i></button>
                                     </form>
                                 </div>

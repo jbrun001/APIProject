@@ -19,7 +19,9 @@ router.get('/list', validateAndSanitiseTransactions, redirectLogin,function(req,
         if (err) {
             next(err)
         }
-        res.render("transactionsList.ejs", {loggedInStatus, availableTransactions:result})
+        res.render("transactionsList.ejs", {loggedInStatus, 
+            availableTransactions:result,
+            crsfToken: req.csrfToken()})
      })
 })
 
@@ -32,6 +34,7 @@ router.post('/add', redirectLogin, function (req, res, next) {
         fund_name: req.body.fund_name,
         previousData: {}, // empty object for data previously entered
         messages: [],     // array for validation messages
+        crsfToken: req.csrfToken()
     });
 })
 
@@ -51,6 +54,7 @@ console.log({ testing: "transaction/added", previousData: req.body, messages: re
             fund_name: req.body.fund_name,
             previousData: req.body,
             messages: req.validationErrors,
+            crsfToken: req.csrfToken()
         });
     }
     else {

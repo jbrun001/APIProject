@@ -73,6 +73,7 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
             previousData: req.query,
             messages: req.validationErrors,
             funds: [],   // if there are errors don't display any funds
+            crsfToken: req.csrfToken()
         });
     }
     else {
@@ -87,6 +88,7 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
                 portfolios: getUserPortfolioResults,
                 previousData: req.query,
                 messages: [],  // if code here then it's successful and messages is empty
+                crsfToken: req.csrfToken()
             });
         })
         .catch((error) => {
@@ -112,30 +114,24 @@ router.post('/list',validateAndSanitiseFunds, redirectLogin, function(req, res, 
         if (err) {
             next(err)
         }
-        res.render("fundsList.ejs", {loggedInStatus, portfolio_id:req.body.portfolio_id, portfolio_name:req.body.portfolio_name, funds:result})
+        res.render("fundsList.ejs", {
+            loggedInStatus, 
+            portfolio_id:req.body.portfolio_id, 
+            portfolio_name:req.body.portfolio_name, 
+            funds:result,
+            crsfToken: req.csrfToken()
+         })
      })
 })
 
 router.get('/add',validateAndSanitiseFunds, redirectLogin, function (req, res, next) {
     let loggedInStatus = getLoggedInUser(req)
     if (req.session.userType == 'admin') {
-        res.render("fundsAdd.ejs",loggedInStatus)
+        res.render("fundsAdd.ejs",{
+            loggedInStatus, 
+            crsfToken: req.csrfToken()})
     } else res.redirect(ORIGIN_URL+"/")
 })
-
-router.post('/added',validateAndSanitiseFunds, function (req, res, next) {
-    // saving data in database
-    let sqlquery = "INSERT INTO funds (name, price) VALUES (?,?)"
-    // execute sql query
-    let newrecord = [req.body.name, req.body.price]
-    db.query(sqlquery, newrecord, (err, result) => {
-        if (err) {
-            next(err)
-        }
-        else
-            res.send(' This fund was added to database, name: '+ fundName + ' price '+ fundPrice)
-    })
-}) 
 
 // Export the router object so index.js can access it
 module.exports = router

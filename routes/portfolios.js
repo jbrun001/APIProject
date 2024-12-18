@@ -13,7 +13,9 @@ router.get('/list', redirectLogin,function(req, res, next) {
         if (err) {
             next(err)
         }
-        res.render("portfoliosList.ejs", {loggedInStatus, availablePortfolios:result})
+        res.render("portfoliosList.ejs", {loggedInStatus, 
+            availablePortfolios:result,
+            crsfToken: req.csrfToken()})
      })
 })
 
@@ -24,6 +26,7 @@ router.get('/add', redirectLogin, function (req, res, next) {
             loggedInStatus,
             previousData: {}, // empty object for data previously entered
             messages: [],     // array for validation messages
+            crsfToken: req.csrfToken()
         });
     } else{
         res.send('You do not have permissions to add a portfolio. <a href='+'/'+'>Home</a>')
@@ -42,6 +45,7 @@ router.post('/added', validateAndSanitisePortfolios, redirectLogin,function (req
             loggedInStatus,
             previousData: req.body,
             messages: req.validationErrors,
+            crsfToken: req.csrfToken()
         });
     }
     else {

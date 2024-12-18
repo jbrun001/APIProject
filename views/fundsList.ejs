@@ -30,6 +30,7 @@
                                     <input type="hidden" name="portfolio_id" value="<%=portfolio_id%>"> 
                                     <input type="hidden" name="fund_id" value="<%=fund.fund_id%>"> 
                                     <input type="hidden" name="fund_name" value="<%= fund.name %> (<%=fund.ticker%>)">
+                                    <input type="hidden" name="_csrf" value="<%= crsfToken %>">
                                     <button type="submit" class="add-btn">Buy/Sell</button>
                                 </form>
                             </div>

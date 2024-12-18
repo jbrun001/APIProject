@@ -93,15 +93,15 @@ app.use('/users', csrfProtection, usersRoutes)
 
 // Load the route handlers for /portfolios
 const portfoliosRoutes = require('./routes/portfolios')
-app.use('/portfolios', portfoliosRoutes)
+app.use('/portfolios', csrfProtection, portfoliosRoutes)
 
 // Load the route handlers for /transactions
 const transactionsRoutes = require('./routes/transactions')
-app.use('/transactions', transactionsRoutes)
+app.use('/transactions', csrfProtection, transactionsRoutes)
 
 // Load the route handlers for /funds
 const fundsRoutes = require('./routes/funds')
-app.use('/funds', fundsRoutes)
+app.use('/funds',csrfProtection, fundsRoutes)
 
 // Load the route handlers for /prices
 const pricesRoutes = require('./routes/prices')

@@ -24,6 +24,7 @@
                                 <option value="size" <%= previousData.sort_by === 'size' ? 'selected' : '' %>>Size</option>
                                 <option value="fee" <%= previousData.sort_by === 'fee' ? 'selected' : '' %>>Fee</option>
                                 <option value="dividend_yield" <%= previousData.sort_by === 'dividend_yield' ? 'selected' : '' %>>Dividend Yield</option>
+                                <input type="hidden" name="_csrf" value="<%= crsfToken %>">
                             </select>
                         </div>
                         <button type="submit" class="search-btn">Search</button>
@@ -67,6 +68,7 @@
                                             </div>
                                             <input type="hidden" name="fund_id" value="<%= fund.id %>">
                                             <input type="hidden" name="fund_name" value="<%= fund.name %> (<%= fund.ticker %>)">
+                                            <input type="hidden" name="_csrf" value="<%= crsfToken %>">
                                             <button type="submit" class="add-btn">Add fund to portfolio</button>
                                         </form>
                                     <% } else { %>

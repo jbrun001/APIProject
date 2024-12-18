@@ -16,6 +16,7 @@
                     <div class="input-field <%= messages.some(error => error.field === 'name') ? 'error-field' : '' %>">
                         <label for="name">Portfolio Name</label>
                         <input type="text" id="name"  value="<%= previousData.name || '' %>" name="name" maxlength="100" required>
+                        <input type="hidden" name="_csrf" value="<%= crsfToken %>">
                     </div>
                     <button type="submit" class="submit-button">Create</button>
                     <% if (messages.length > 0) { %>
