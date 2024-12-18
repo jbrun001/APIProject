@@ -56,6 +56,7 @@ app.use(session({
     }
 }))
 
+console.log(`Domain: ${cookieDomain} Path: ${cookiePath}`)
 // Security.  Disable this header to make it harder for attackers to know what technology is being used
 app.disable('x-powered-by')   
 
