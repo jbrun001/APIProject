@@ -1,11 +1,12 @@
 // Create a new router
 const express = require("express")
-const { validateAndSanitiseUsers } = require('../middleware/validateAndSanitiseInput');
+const router = express.Router()
+const { validateAndSanitiseUsers } = require('../helpers/validateAndSanitiseInput');
 const { getLoggedInUser } = require('../helpers/getLoggedInUser');
+const { ORIGIN_URL } = require('../helpers/getOriginURL')
+const { redirectLogin} = require('../helpers/redirectLogin')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
-
-const router = express.Router()
 
 // Security. Import express-rate-limit so we can stop brute forcing
 // of the login
@@ -15,16 +16,6 @@ const loginRateLimiter = rateLimit({
     max: 5,                             // limit each IP to 5 login attempts per minute
     message: "{error:'Rate Limited', message: 'Too many login attempts, please try again after 1 minute.'}"
 });
-
-// get the start of the URL from index.js
-const { ORIGIN_URL } = require('../index.js');
-const redirectLogin = (req, res, next) => {
-    if (!req.session.userId ) {       
-        res.redirect(ORIGIN_URL+'/users/login') // redirect to the login page
-    } else { 
-        next (); // move to the next middleware function
-    } 
-}
 
 router.get('/register', function (req, res, next) {
     let loggedInStatus = getLoggedInUser(req)

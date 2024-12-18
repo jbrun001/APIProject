@@ -29,6 +29,16 @@ const sanitiseInputs = (req, res, next) => {
             req.query[key] = req.sanitize(req.query[key]);
         });
     }
+
+    // if there is a req.params because the data is in the path (used in the API)
+    if (req.params) {
+        // for each field that is in req.query
+        Object.keys(req.params).forEach((key) => {
+            // sanitise it and replace it with the sanitised version
+            req.params[key] = req.sanitize(req.params[key]);
+        });
+    }
+
     next();
 };
 

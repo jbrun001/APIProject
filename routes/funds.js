@@ -2,25 +2,10 @@
 // this route manages pages relating to funds
 const express = require("express")
 const router = express.Router()
-const { validateAndSanitiseFunds } = require('../middleware/validateAndSanitiseInput');
+const { validateAndSanitiseFunds } = require('../helpers/validateAndSanitiseInput');
 const { getLoggedInUser } = require('../helpers/getLoggedInUser');
-
-// get the start of the URL from index.js
-const { ORIGIN_URL } = require('../index.js');
-const redirectLogin = (req, res, next) => {
-    if (!req.session.userId ) {       
-        res.redirect(ORIGIN_URL+'/users/login') // redirect to the login page
-    } else { 
-        next (); // move to the next middleware function
-    } 
-}
-
-router.get('/search',redirectLogin,function(req, res, next){
-    res.render("fundsSearch.ejs",{
-        previousData: {}, // empty object for data previously entered
-        messages: [],     // array for validation messages
-    });
-})
+const { ORIGIN_URL } = require('../helpers/getOriginURL')
+const { redirectLogin} = require('../helpers/redirectLogin')
 
 // getFundsSearchResults
 // gets searches funds based on the parameters passed and orders the result by the sort_by parameter
@@ -39,8 +24,6 @@ function getFundSearch(search_text, sort_by) {
         if (sort_by === "fee") order = ' fee ASC'           // except fees which are in ascending order
         sqlquery = "SELECT * FROM funds WHERE "
         sqlquery = sqlquery + "name LIKE '" + search_text + "' ORDER BY " + order
-//console.log('getFundSearchResult: sqlquery: >' + sqlquery + '<')
-        // execute sql query
         db.query(sqlquery, (err, results) => {
             if (err) {
                 console.error(err.message);

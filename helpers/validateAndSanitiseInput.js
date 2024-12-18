@@ -12,8 +12,8 @@
 //    be used in all routes, regardless of what inputs there are
 //  - if after calling req.validationErrors doesn't exist then there 
 //    are no validation errors
-const { body, query, validationResult } = require('express-validator');
-const sanitiseInputs = require('../middleware/sanitiseInputs'); 
+const { param,query,body, validationResult } = require('express-validator');
+const sanitiseInputs = require('./sanitiseInputs'); 
 
 // validation and sanitisation for all of the fund fields
 const validateAndSanitiseFunds = [
@@ -25,6 +25,11 @@ const validateAndSanitiseFunds = [
     query('sort_by')
         .optional()
         .isIn(['size', 'fee', 'dividend_yield']).withMessage('Incorrect sorting field')
+        .trim(),
+    param('search_text')
+        .optional()
+        .isLength({ min: 3 }).withMessage('Search text must be greater than 3 characters')
+        .isAlphanumeric('en-US', { ignore: ' ' }).withMessage('Search text must be alphanumeric')
         .trim(),
     sanitiseInputs,
     (req, res, next) => {

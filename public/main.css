@@ -168,7 +168,8 @@ body {
 .form-container {
     background: #ffffff;
     padding: 24px;
-    width: 400px;
+    min-width: 100px;
+    max-width: 75%;
 }
 
 .form-container h1 {
@@ -335,7 +336,7 @@ h1 {
 /* floating action button - add for add a new portfolio */
 .fab {
     position: fixed;
-    bottom: 20px;
+    bottom: max(10px, env(safe-area-inset-bottom) + 20px);
     right: 20px;
     width: 56px;
     height: 56px;
@@ -444,4 +445,13 @@ h1 {
 .delete-btn:hover, .add-btn:hover, .search-btn:hover, .submit-button:hover, .fab:hover, .filter-container .search-btn:hover {
     background-color: var(--background-colour-hover);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+@media screen and (max-width: 768px) {          /* for mobile screens smaller than 768px */
+    .content {
+        left: 0;                                /* remove left offset (menu width) */
+        width: 100%;                            /* use full width for content */
+        top: var(--header-height);              /* keep starting under the header */
+        padding: 15px;                          /* adjust padding for smaller screens */
+    }
 }

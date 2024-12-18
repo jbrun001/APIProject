@@ -3,16 +3,8 @@ const { body, validationResult } = require('express-validator');
 const router = express.Router()
 const { getLoggedInUser } = require('../helpers/getLoggedInUser.js');
 const request = require('request')
-
-// get the start of the URL from index.js
-const { ORIGIN_URL } = require('../index.js');
-const redirectLogin = (req, res, next) => {
-    if (!req.session.userId ) {       
-        res.redirect(ORIGIN_URL+'/users/login') // redirect to the login page
-    } else { 
-        next (); // move to the next middleware function
-    } 
-}
+const { ORIGIN_URL } = require('../helpers/getOriginURL')
+const { redirectLogin} = require('../helpers/redirectLogin')
 
 // setAPIPriceData
 // this executes all of sql statements in the object passed

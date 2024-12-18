@@ -75,16 +75,6 @@ global.db = db
 // Define our application-specific data
 app.locals.appData = {appName: "Fund Tracker"}
 
-// get the first part of the URL from .env if the system is in production
-let ORIGIN_URL = 'http://localhost:' + port;  
-//note: PRODUCTION_URL=https://doc.gold.ac.uk/usr/199 is the correct entry for the uni production server 
-if (process.env.PRODUCTION_URL && process.env.LIVE_SYSTEM.toLowerCase() == "true") {
-  ORIGIN_URL = process.env.PRODUCTION_URL.toLowerCase();
-}
-console.log("the ORIGIN_URL is: " + ORIGIN_URL + " (set .env LIVE_SYSTEM=true & PRODUCTION_URL=fullurl to change URL) ")
-// export ORIGIN so it can be used in all routes
-module.exports = { ORIGIN_URL }; 
-
 // Load the route handlers
 const mainRoutes = require("./routes/main")
 app.use('/', mainRoutes)

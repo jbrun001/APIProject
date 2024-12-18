@@ -1,17 +1,9 @@
 const express = require("express")
 const router = express.Router()
-const { validateAndSanitisePortfolios } = require('../middleware/validateAndSanitiseInput');
+const { validateAndSanitisePortfolios } = require('../helpers/validateAndSanitiseInput');
 const { getLoggedInUser } = require('../helpers/getLoggedInUser');
-
-// get the start of the URL from index.js
-const { ORIGIN_URL } = require('../index.js');
-const redirectLogin = (req, res, next) => {
-    if (!req.session.userId ) {       
-        res.redirect(ORIGIN_URL+'/users/login') // redirect to the login page
-    } else { 
-        next (); // move to the next middleware function
-    } 
-}
+const { ORIGIN_URL } = require('../helpers/getOriginURL')
+const { redirectLogin } = require('../helpers/redirectLogin')
 
 router.get('/list', redirectLogin,function(req, res, next) {
     let loggedInStatus = getLoggedInUser(req)
