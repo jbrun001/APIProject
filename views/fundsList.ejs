@@ -12,6 +12,7 @@
         <main class="content">
             <div class="main">
                 <h1>Portfolio: <%= portfolio_name %>  </h1>
+                <% if (funds.length > 0 ) { %>
                 <ul class="item-list">
                     <% funds.forEach(function(fund) { %>
                     <li class="item">
@@ -38,6 +39,11 @@
                     </li>
                     <% }) %>
                 </ul>
+                <% } else { %>
+                    <p>Looks like you don't have any funds with shares in this portfolio<p>
+                    <p>Click the plus at the bottom to find a fund,</p>
+                    <p>select one and add a transaction to make it appear here.</p>
+                <% } %>
                 <a href="search-result" class="fab" id="fab-add">
                     <i class="material-icons">add</i>
                 </a>

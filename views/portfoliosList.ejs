@@ -12,6 +12,7 @@
         <main class="content">
             <div class="main">
                 <h1>My Portfolios</h1>
+                <% if (availablePortfolios.length > 0 ) { %>
                 <ul class="item-list">
                     <% availablePortfolios.forEach(function(portfolio) { %>
                         <li class="item">
@@ -39,6 +40,9 @@
                         </li>
                     <% }) %>
                 </ul>
+                <% } else { %>
+                <p>Looks like you don't have any portfolios, click on the plus at the bottom to add one...</p>
+                <% } %>
                 <a href="add" class="fab" id="fab-add">
                     <i class="material-icons">add</i>
                 </a>              

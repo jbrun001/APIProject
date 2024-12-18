@@ -12,6 +12,7 @@
         <main class="content">
             <div class="main">
                 <h1>My Transactions</h1>
+                <% if (availableTransactions.length > 0 ) { %>
                 <ul class="item-list">
                     <% availableTransactions.forEach(function(transaction) { %>
                         <li class="item">
@@ -35,7 +36,12 @@
                             </div>
                         </li>
                     <% }) %>
-                </ul>     
+                </ul> 
+                <% } else { %>
+                    <p>Looks like you don't have any transactions<p>
+                    <p>you can add transactions from the find funds page,</p>
+                    <p>or you can click buy/sell from the fund in one of your portfolios</p>
+                <% } %>    
             </div>
         </main>
         <%- include('footerMenu') %>
