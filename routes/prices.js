@@ -6,10 +6,92 @@ const request = require('request')
 const { ORIGIN_URL } = require('../helpers/getOriginURL')
 const { redirectLogin} = require('../helpers/redirectLogin')
 
-// setAPIPriceData
-// this executes all of sql statements in the object passed
-// the object contains the query and the parameters to be
-// replaced
+// formats a javascript date to 'YYYY-MM-DD'
+// used to make sure that when we are comparing dates from the API data
+// and the database we are using the same format
+function formatDate(date) {
+    if (!date) {
+        return ''; // Handle null or undefined by a blank string
+    }
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        // if already in 'YYYY-MM-DD' format, return it directly
+        return date;
+    }
+    if (date instanceof Date && !isNaN(date)) {                             // if it's a valid date object, format it
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+}
+
+// setPricesFromAPIData called from /update route
+//      gets the data for the current fund from the alphavantage API
+//      it checks each date to see if it's later that the data we have 
+//          if it's later then it adds a query and params to the sqlInsert object
+//      it then executes them by calling setAPIPriceData and waits for the result (which will errors and information about how many updated) 
+//      it calls setLastFundUpdate
+function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
+    return new Promise((resolve, reject) => {
+        const apiKey = process.env.API_KEY_ALPHAVANTAGE 
+        //const url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`;
+        const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`       
+        request(url, (err, response, body) => {                                             // get the data from the API
+            // use err to keep a track of all the errors using new Error to add to the object
+            if (err) {
+                return reject(new Error('Error fetching data from API: ' + err))
+            }
+            const prices = JSON.parse(body)
+            if (prices["Time Series (Daily)"] === undefined) {
+                return reject(new Error('Invalid API response: No Time Series data. API limit has been reached. If this has happened the price data is already the latest price data'))
+            }
+            const timeSeries = prices["Time Series (Daily)"]
+            const sqlInserts = []
+            let dataSaved = false
+            // for every record in the API data that we want to insert create an insert query and params pair and store in sqlInserts
+            // we don't want to insert records we already have so only do this if the date in the API data is > the last_update 
+            for (const [price_date, values] of Object.entries(timeSeries)) {              
+                const APIFormattedDate = formatDate(price_date)                             // Make sure dates we are comparing are all YYYY-MM-DD
+                // console.log(`fund: ${fund_id} lastPriceUpdate: ${lastPriceUpdate} API formatted date: ${APIFormattedDate}`)
+                if (APIFormattedDate > lastPriceUpdate) {                                   // only include data more recent than the last update
+                    dataSaved = true;                                                       // remember that we have new data so we can change last_updated later on
+                    const open = values["1. open"]
+                    const high = values["2. high"]
+                    const low = values["3. low"]
+                    const close = values["4. close"]
+                    const volume = values["5. volume"]
+                    const sql = `
+                        INSERT INTO prices (fund_id, ticker, price_date, open, high, low, close, volume)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    `
+                    sqlInserts.push({                                                           // store this pair of query and params in sqlInserts
+                        query: sql,
+                        params: [fund_id, ticker, APIFormattedDate, open, high, low, close, volume],
+                    })
+                }
+            }
+            // if there are any insert statements in sqlInserts call function to execute them all
+            if (sqlInserts.length > 0) {
+                setAPIPriceData(sqlInserts)
+                    .then(() => {                                                              // if inserts were successful update the last_update in funds
+                        // if (dataSaved) {                                                    // do this every time
+                            return setFundLastUpdate(fund_id)                                   
+                        //}
+                        //return null;
+                    })
+                    .then(() => resolve(sqlInserts))                                          // resolve the promise
+                    .catch((error) => reject(new Error('Database update failed: ' + error)))
+            } else {
+                resolve([])                                                                   // resolve the promise
+            }
+        });
+    });
+}
+
+// setAPIPriceData called from set setPricesFromAPIData
+//   this executes all of sql statements in the object passed
+//   the object contains the query and the parameters to be
+//   replaced 
 function setAPIPriceData(sqlInserts) {
     return Promise.all(
         sqlInserts.map(({ query, params }) => {                                 
@@ -27,27 +109,9 @@ function setAPIPriceData(sqlInserts) {
     )
 };
 
-// formats a javascript date to 'YYYY-MM-DD'
-function formatDate(date) {
-    if (!date) {
-        return ''; // Handle null or undefined by a blank string
-    }
-    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        // if already in 'YYYY-MM-DD' format, return it directly
-        return date;
-    }
-    if (date instanceof Date && !isNaN(date)) {                             // if it's a valid Date object, format it
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-    throw new Error('Invalid date input'); // Throw an error for invalid inputs
-}
-// setFundLastUpdate
-//  this sets the last_update field to today
-//  used after data has been loaded from the API
-//  must be used with a promise
+// setFundLastUpdate called from setPricesFromAPIData
+//  this sets the last_update and last_price in funds to the most recent price data
+//  in the prices table for the passed fund_id
 function setFundLastUpdate(fund_id) {
     return new Promise((resolve, reject) => {
         const currentDate = formatDate(new Date())
@@ -70,76 +134,17 @@ function setFundLastUpdate(fund_id) {
                 resolve(results);
             }
         });
-        console.log('Updating last_update field:', sql, fund_id)
+        // console.log('Updating last_update field:', sql, fund_id)
         resolve()
     });
 }
 
-// setPricesFromAPIData
-//  this updates one fund by calling the alphavantage API
-//  it inserts records in the prices table for dates
-//  that don't have a record from the API results
-//  it updates the last_update date in the fund
-//  lastPriceData is a string in the format YYYY-MM-DD
-function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
-    return new Promise((resolve, reject) => {
-        const apiKey = process.env.API_KEY_ALPHAVANTAGE 
-        //const url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`;
-        const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`       
-        request(url, (err, response, body) => {                                             // get the data from the API
-            // use err to keep a track of all the errors using new Error to add to the object
-            if (err) {
-                return reject(new Error('Error fetching data from API: ' + err))
-            }
-            const prices = JSON.parse(body)
-            if (prices["Time Series (Daily)"] === undefined) {
-                return reject(new Error('Invalid API response: No Time Series data. API limit has been reached. If this has happened the price data is already the latest price data'))
-            }
-            const timeSeries = prices["Time Series (Daily)"]
-            const sqlInserts = []
-            let dataSaved = false
-            // for every record in the API data that we want to insert create an insert query and params pair and store in sqlInserts
-            // we don't want to insert records we already have so only do this if the date in the API data is > the last_update 
-            for (const [price_date, values] of Object.entries(timeSeries)) {              
-                const APIFormattedDate = formatDate(price_date)                             // Make sure dates we are comparing are all YYYY-MM-DD
-console.log(`fund: ${fund_id} lastPriceUpdate: ${lastPriceUpdate} API formatted date: ${APIFormattedDate}`)
-                if (APIFormattedDate > lastPriceUpdate) {                                   // only include data more recent than the last update
-                    dataSaved = true;                                                       // remember that we have new data so we can change last_updated later on
-                    const open = values["1. open"]
-                    const high = values["2. high"]
-                    const low = values["3. low"]
-                    const close = values["4. close"]
-                    const volume = values["5. volume"]
-                    const sql = `
-                        INSERT INTO prices (fund_id, ticker, price_date, open, high, low, close, volume)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    `
-                    sqlInserts.push({                                                           // store this pair of query and params in sqlInserts
-                        query: sql,
-                        params: [fund_id, ticker, APIFormattedDate, open, high, low, close, volume],
-                    })
-                }
-            }
-            // if there are any insert statements in sqlInserts call function to execute them all
-            if (sqlInserts.length > 0) {
-                setAPIPriceData(sqlInserts)
-                    .then(() => {                                                              // if inserts were successful update the last_update in funds
-                        // if (dataSaved) {                                                    // test by doing every time
-                            return setFundLastUpdate(fund_id)                                   
-                        //}
-                        //return null;
-                    })
-                    .then(() => resolve(sqlInserts))                                          // resolve the promise
-                    .catch((error) => reject(new Error('Database update failed: ' + error)))
-            } else {
-                resolve([])                                                                   // resolve the promise
-            }
-        });
-    });
-}
-
-// new version of update - old version renamed to update-orginal
-// this version tests the new functions created
+// update
+//   this route inserts new records into the prices table for any fund
+//   that has the latest price data less than today
+//   it first gets a list of matching funds if there are none then there is no need to call the api
+//   for each row it creates a promise containing a call to setPricesFromDataAPI
+//   it then executes all of those and waits for the result (which will be information about what happened)
 router.get('/update', redirectLogin, function (req, res, next) {
     const startTime = Date.now()
     const loggedInStatus = getLoggedInUser(req)

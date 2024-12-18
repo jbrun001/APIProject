@@ -12,7 +12,7 @@
         <main class="content">
             <div class="form-container">
                 <h1>Register for <%=appData.appName%></h1>
-                <form id="loginForm" method="POST" action="/users/registered">
+                <form id="registerForm" method="POST" action="/users/registered">
                     <div class="input-field <%= messages.some(error => error.field === 'email') ? 'error-field' : '' %>">
                         <label for="email">Email:</label>
                         <input type="email" id="email" name="email" value="<%= previousData.email || '' %>" maxlength="60" required>
@@ -21,6 +21,7 @@
                         <label for="password">Password:</label>
                         <input type="password" id="password" name="password" value="<%= previousData.password || '' %>" maxlength="20" required>
                     </div>
+                    <input type="hidden" name="_csrf" value="<%= crsfToken %>">
                     <button type="submit" class="submit-button">Register</button>
                     <% if (messages.length > 0) { %>
                     <ul>

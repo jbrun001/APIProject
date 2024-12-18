@@ -46,7 +46,7 @@ use nano to create .env file (contains security details so not synced with git)
 
 `mysql> quit`
 
-`npm install dotenv mysql2 express express-session ejs bcrypt express-validator express-sanitizer request express-rate-limit`
+`npm install dotenv mysql2 express express-session ejs bcrypt express-validator express-sanitizer request express-rate-limit csurf`
 
 `sudo apt install -g forever`
 
@@ -80,6 +80,3 @@ Cache: Minimum L1 cache of 32K for data and 32K for instructions, L2 cache of 40
 
 Memory: minimum 512MB (for O/S and just this application running)
 
-# demo system login credentials and roles
-
-customer: `jake@123.com testing1@`

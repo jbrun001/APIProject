@@ -28,8 +28,9 @@ router.get('/register', function (req, res, next) {
     // them
     res.render('register.ejs', {
         loggedInStatus,
-        previousData: {}, // empty object for data previously entered
-        messages: [],     // array for validation messages
+        previousData: {},                               // empty object for data previously entered
+        messages: [],                                   // array for validation messages
+        crsfToken: req.csrfToken()                      // csrf token
     });
 })    
 
@@ -45,6 +46,7 @@ router.post('/registered', validateAndSanitiseUsers, function (req, res, next) {
             loggedInStatus,
             previousData: req.body,
             messages: req.validationErrors,
+            crsfToken: req.csrfToken()                      // csrf token
         });
     }
     else {
@@ -79,7 +81,7 @@ router.get('/list',redirectLogin, function(req, res, next) {
 router.get('/login', function(req, res, next) {
     const userInstruction = " "
     let loggedInStatus = getLoggedInUser(req)
-    res.render('login.ejs', {userInstruction, loggedInStatus})  
+    res.render('login.ejs', {userInstruction, loggedInStatus, crsfToken: req.csrfToken()}) 
 })
 
 router.post('/loggedin', loginRateLimiter, function(req, res, next) {
@@ -125,7 +127,7 @@ router.post('/loggedin', loginRateLimiter, function(req, res, next) {
                 }
                 else {
                     let loggedInStatus = getLoggedInUser(req)
-                    res.render('login.ejs', {userInstruction, loggedInStatus})  
+                    res.render('login.ejs', {userInstruction, loggedInStatus, crsfToken: req.csrfToken()})  
                 }
             })
         }

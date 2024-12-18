@@ -11,10 +11,11 @@ const sanitiseInputs = (req, res, next) => {
     if (req.body) {
         // for each field that is in req.body
         Object.keys(req.body).forEach((key) => {
-            // don't sanitise password because it could change what the user input
+            // don't sanitise password  because it could change what the user input
             // sql injection for password field is managed in validateAndSanitiseInput
             // so sql injection chars not allowed in the password field
-            if (key !== 'password') { 
+            // and don't sanitise the _crsf token
+            if (key !== 'password' && (key !=='_csrf')) { 
                 // sanitise it and replace it with the sanitised version
                 req.body[key] = req.sanitize(req.body[key]);
             }

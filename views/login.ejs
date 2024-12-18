@@ -18,6 +18,7 @@
                           <input type="email" id="email" name="email" maxlength="60" required>
                           <label for="password">Password:</label>
                           <input type="password" id="password" name="password" maxlength="20" required>
+                          <input type="hidden" name="_csrf" value="<%= crsfToken %>">
                       </div>
                       <button type="submit" class="submit-button">Login</button>
                   </form>
