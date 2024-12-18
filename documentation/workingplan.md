@@ -22,14 +22,14 @@ gantt
     Code New interfaces       :done,    d3, after d2, 4d
     Project delay (Focus on FYP) :done,    delay1, after d3, 9d
     Code Application API      :done,    dd3a, after delay1, 6d
-    Seurity changes and testing : active, d4, after dd3a, 2d
+    Seurity changes and testing : done, d4, after dd3a, 2d
     styling                   : done,   d6, after dd3a, 4d
     development contingency           :until doccomplete
 
     section Documentation
     start documentation :done,    d0, 2024-11-07,2024-11-08   
     draft documentation in mark down  :until finaldoc
-    start final doc            :finaldoc, after d6, 4h
+    start final doc            :done, finaldoc, after d6, 4h
     final documentation :until doccomplete 
     Documentation complete              :milestone, doccomplete, 2025-01-06, 0d
 
