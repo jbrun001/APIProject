@@ -29,15 +29,21 @@ function setAPIPriceData(sqlInserts) {
 
 // formats a javascript date to 'YYYY-MM-DD'
 function formatDate(date) {
-    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {  // check if already string YYYY-MM-DD
-        return date 
+    if (!date) {
+        return ''; // Handle null or undefined by a blank string
     }
-    const year = date.getFullYear() 
-    const month = String(date.getMonth() + 1).padStart(2, '0') 
-    const day = String(date.getDate()).padStart(2, '0') 
-    return `${year}-${month}-${day}` 
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        // if already in 'YYYY-MM-DD' format, return it directly
+        return date;
+    }
+    if (date instanceof Date && !isNaN(date)) {                             // if it's a valid Date object, format it
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    throw new Error('Invalid date input'); // Throw an error for invalid inputs
 }
-
 // setFundLastUpdate
 //  this sets the last_update field to today
 //  used after data has been loaded from the API
@@ -51,7 +57,8 @@ function setFundLastUpdate(fund_id) {
         // retrieved from the external API
         const sql = `
             UPDATE funds 
-            SET last_update = curdate(), 
+            SET last_update = (SELECT price_date FROM prices WHERE prices.fund_id = funds.id 
+                ORDER BY price_date DESC LIMIT 1), 
                 last_price = (SELECT close FROM prices WHERE prices.fund_id = funds.id 
                 ORDER BY price_date DESC LIMIT 1) 
             WHERE id = ?`
@@ -77,8 +84,8 @@ function setFundLastUpdate(fund_id) {
 function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
     return new Promise((resolve, reject) => {
         const apiKey = process.env.API_KEY_ALPHAVANTAGE 
-        // const url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`;
-        const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`       
+        const url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`;
+        // const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`       
         request(url, (err, response, body) => {                                             // get the data from the API
             // use err to keep a track of all the errors using new Error to add to the object
             if (err) {
@@ -95,6 +102,7 @@ function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
             // we don't want to insert records we already have so only do this if the date in the API data is > the last_update 
             for (const [price_date, values] of Object.entries(timeSeries)) {              
                 const APIFormattedDate = formatDate(price_date)                             // Make sure dates we are comparing are all YYYY-MM-DD
+console.log(`fund: ${fund_id} lastPriceUpdate: ${lastPriceUpdate} API formatted date: ${APIFormattedDate}`)
                 if (APIFormattedDate > lastPriceUpdate) {                                   // only include data more recent than the last update
                     dataSaved = true;                                                       // remember that we have new data so we can change last_updated later on
                     const open = values["1. open"]
@@ -115,11 +123,11 @@ function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
             // if there are any insert statements in sqlInserts call function to execute them all
             if (sqlInserts.length > 0) {
                 setAPIPriceData(sqlInserts)
-                    .then(() => {                                                               // if inserts were successful update the last_update in funds
-                        if (dataSaved) {
-                            return setFundLastUpdate(fund_id)
-                        }
-                        return null;
+                    .then(() => {                                                              // if inserts were successful update the last_update in funds
+                        // if (dataSaved) {                                                    // test by doing every time
+                            return setFundLastUpdate(fund_id)                                   
+                        //}
+                        //return null;
                     })
                     .then(() => resolve(sqlInserts))                                          // resolve the promise
                     .catch((error) => reject(new Error('Database update failed: ' + error)))
@@ -170,7 +178,7 @@ router.get('/update', redirectLogin, function (req, res, next) {
         // create the requests using setPricesFromAPIData
         const updatePromises = result.map((row) => {
             const {fund_id, ticker, lastPriceData} = row                                    // get the values from the current row in result                                    
-            const lastPriceUpdate = lastPriceData || ''                                     // default to an empty string if null
+            const lastPriceUpdate = formatDate(lastPriceData) ?? ''                      // default to an empty string if null, convert to YYYY-MM-DD
 
             return setPricesFromAPIData(fund_id, ticker, lastPriceUpdate)
             .then((sqlInserts) => ({fund_id, ticker, sqlInserts}))                          
@@ -216,6 +224,13 @@ router.get('/test-external-api',function(req, res, next){
         "5. Time Zone": "US/Eastern"
     },
     "Time Series (Daily)": {
+        "2024-11-28": {
+            "1. open": "36.8000",
+            "2. high": "36.8600",
+            "3. low": "36.6922",
+            "4. close": "36.7725",
+            "5. volume": "17315"
+        },
         "2024-11-27": {
             "1. open": "36.8000",
             "2. high": "36.8600",
