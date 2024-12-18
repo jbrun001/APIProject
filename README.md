@@ -1,4 +1,4 @@
-# README.ME for Fund Tracker
+# README for Fund Tracker
 This is the readme containing installation instructions for the Fund Tracker App.
 
 # Initial Installation
