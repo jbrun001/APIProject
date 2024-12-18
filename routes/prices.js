@@ -80,6 +80,7 @@ function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
         // const url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`;
         const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`       
         request(url, (err, response, body) => {                                             // get the data from the API
+            // use err to keep a track of all the errors using new Error to add to the object
             if (err) {
                 return reject(new Error('Error fetching data from API: ' + err))
             }
@@ -90,11 +91,12 @@ function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
             const timeSeries = prices["Time Series (Daily)"]
             const sqlInserts = []
             let dataSaved = false
-            // for every record in the API data that we want to update create an insert query and params pair and store in sqlInserts 
+            // for every record in the API data that we want to insert create an insert query and params pair and store in sqlInserts
+            // we don't want to insert records we already have so only do this if the date in the API data is > the last_update 
             for (const [price_date, values] of Object.entries(timeSeries)) {              
                 const APIFormattedDate = formatDate(price_date)                             // Make sure dates we are comparing are all YYYY-MM-DD
                 if (APIFormattedDate > lastPriceUpdate) {                                   // only include data more recent than the last update
-                    dataSaved = true;                                                       // remember that we have new data to save
+                    dataSaved = true;                                                       // remember that we have new data so we can change last_updated later on
                     const open = values["1. open"]
                     const high = values["2. high"]
                     const low = values["3. low"]
@@ -104,7 +106,7 @@ function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
                         INSERT INTO prices (fund_id, ticker, price_date, open, high, low, close, volume)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     `
-                    sqlInserts.push({
+                    sqlInserts.push({                                                           // store this pair of query and params in sqlInserts
                         query: sql,
                         params: [fund_id, ticker, APIFormattedDate, open, high, low, close, volume],
                     })
@@ -147,12 +149,12 @@ router.get('/update', redirectLogin, function (req, res, next) {
             LEFT JOIN prices ON prices.fund_id = funds.id
             WHERE (funds.last_update < curdate() OR funds.last_update is null)
             GROUP by funds.id, name, ticker`
-
     db.query(sqlquery,(err, result) => {
         if (err) {
             next(err)
         }
-
+        // if there are no results then there are no funds with a null update date or a date less than the current date
+        // and there is no need to call the API
         if (result.length === 0) {
             console.log('No funds require updating.');
             return res.render('pricesUpdate.ejs', 
@@ -163,29 +165,26 @@ router.get('/update', redirectLogin, function (req, res, next) {
                     sqlInsert : []}], 
                 loggedInStatus });
         }
-
+        // if there are results (funds that need updating)
+        // go through every row in the result and 
+        // create the requests using setPricesFromAPIData
         const updatePromises = result.map((row) => {
-            const {fund_id, ticker, lastPriceData} = row
+            const {fund_id, ticker, lastPriceData} = row                                    // get the values from the current row in result                                    
             const lastPriceUpdate = lastPriceData || ''                                     // default to an empty string if null
 
             return setPricesFromAPIData(fund_id, ticker, lastPriceUpdate)
-            .then((sqlInserts) => ({                                                        // 
-                fund_id,
-                ticker,
-                sqlInserts,
-            }))
+            .then((sqlInserts) => ({fund_id, ticker, sqlInserts}))                          
             .catch((error) => {
                 console.error(`Error updating prices for Fund ID: ${fund_id}, Ticker: ${ticker}`, error.message)
                 return {fund_id, ticker, error: error.message}
             })
         })
 
-        // Wait for all updates to complete
+        // execute the requests prepared above and wait for them all to finish
         Promise.all(updatePromises)
-        .then((updateResults) => {
-            const endTime = Date.now()
-
-            // Log the total time and results
+        .then((updateResults) => {                                                  // use the results to log any errors
+            const endTime = Date.now()                                              // to check how long it took
+            // log the total time and results
             console.log('Timing: Total time taken:', endTime - startTime, 'ms.')
             updateResults.forEach((result) => {
                 if (result.error) {
@@ -920,7 +919,6 @@ router.get('/test-external-api',function(req, res, next){
     }
 }`)
 })
-
 
 // Export the router object so index.js can access it
 module.exports = router

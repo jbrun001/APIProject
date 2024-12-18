@@ -3,6 +3,7 @@ var express = require ('express')
 var session = require ('express-session')
 var validator = require ('express-validator');
 const expressSanitizer = require('express-sanitizer');
+const {ORIGIN_URL} = require('./helpers/getOriginURL');
 var ejs = require('ejs')
 var mysql = require('mysql2')
 
@@ -26,14 +27,32 @@ app.use(express.urlencoded({ extended: true }))
 // Set up public folder (for css and statis js)
 app.use(express.static(__dirname + '/public'))
 
-// Create a session
+// Security if we are in developement dont use https for the cookies
+// but if we are live then use https for the cookies
+let cookieSecure = true
+let httpOnly = true
+const url = new URL(ORIGIN_URL);
+const cookieDomain = url.hostname;    // extracts the domain 
+let cookiePath = url.pathname;        // extracts the path 
+if (!cookiePath.endsWith('/')) {
+    cookiePath += '/';
+}
+if (process.env.LIVE_SYSTEM.toLowerCase() == "false") {
+    cookieSecure = false
+}
+
+// create a session
 app.use(session({
     secret: process.env.SESSION_SECRET,       // use long session secret and keep in .env so not published on github
     name: process.env.SESSION_NAME,           // use a random session name so it's unpredictable for attackers, and put in .env
     resave: false,
     saveUninitialized: false,                 // don't save sessions unless it's needed
     cookie: {
-        expires: 600000                       // 10 mins before re-login is this too long?
+          secure: cookieSecure,               // force https when on live server but not in development
+          httpOnly: true,                     // cookie can't be set by javascript
+          domain: cookieDomain,               // restricts cookie sending to just this domain
+          path: cookiePath,                   // restricts cookie sending to just the part of the path that has the routes
+          expires: 600000                     // 10 mins before re-login is this too short?
     }
 }))
 

@@ -116,7 +116,6 @@ router.post('/list',validateAndSanitiseFunds, redirectLogin, function(req, res, 
      })
 })
 
-
 router.get('/add',validateAndSanitiseFunds, redirectLogin, function (req, res, next) {
     let loggedInStatus = getLoggedInUser(req)
     if (req.session.userType == 'admin') {
@@ -137,7 +136,6 @@ router.post('/added',validateAndSanitiseFunds, function (req, res, next) {
             res.send(' This fund was added to database, name: '+ fundName + ' price '+ fundPrice)
     })
 }) 
-
 
 // Export the router object so index.js can access it
 module.exports = router
