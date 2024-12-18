@@ -84,8 +84,8 @@ function setFundLastUpdate(fund_id) {
 function setPricesFromAPIData(fund_id, ticker, lastPriceUpdate) {
     return new Promise((resolve, reject) => {
         const apiKey = process.env.API_KEY_ALPHAVANTAGE 
-        const url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`;
-        // const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`       
+        //const url = `http://localhost:8000/prices/test-external-api/?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`;
+        const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${apiKey}`       
         request(url, (err, response, body) => {                                             // get the data from the API
             // use err to keep a track of all the errors using new Error to add to the object
             if (err) {
