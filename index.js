@@ -111,6 +111,17 @@ app.use('/prices', pricesRoutes)
 const apiRoutes = require('./routes/api')
 app.use('/api', apiRoutes)
 
+// security. if the session has expired then the crsf token will have expired
+// so catch this error if it happens - otherwise it will just look like
+// an internal server error
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+      res.status(403).send('Session expired and with it the CRSF token.</br>Please <a href="/">click here</a> and try again.');
+  } else {
+      next(err); 
+  }
+});
+
 // security. custom 404 so default will not give away we are using express
 app.use((req, res, next) => {
   res.status(404).send("That resouce cannot be found")
