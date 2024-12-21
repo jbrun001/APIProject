@@ -116,8 +116,38 @@ app.use('/api', apiRoutes)
 // an internal server error
 app.use((err, req, res, next) => {
   if (err.code === 'EBADCSRFTOKEN') {
-      res.status(403).send('Session expired and with it the CRSF token.</br>Please <a href="/">click here</a> and try again.');
-  } else {
+      res.status(403).send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">        
+                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined">                <title>Session Expired</title>
+                <script>
+                    let countdown = 4;                              // starting countdown timer value
+                    function updateCountdown() {
+                        const countdownElement = document.getElementById('countdown');
+                        countdownElement.textContent = countdown;
+                        if (countdown <= 0) {
+                            window.location.href = '/users/login';  // redirect to login page
+                        } else {
+                            countdown--;
+                            setTimeout(updateCountdown, 1000);      // update every second
+                        }
+                    }
+                    window.onload = updateCountdown;                // start countdown on page load
+                </script>
+            </head>
+            <body>
+                <h1><span class="material-symbols-outlined">error</span> Session Expired / Invalid CSRF token</h1>
+                <p>Your session has expired.</p>
+                <p>Redirecting to the login page in <span id="countdown">5</span> seconds...</p>
+                <p>If you are not redirected, <a href="/users/login">click here</a>.</p>
+            </body>
+            </html>
+        `);
+      } else {
       next(err); 
   }
 });
