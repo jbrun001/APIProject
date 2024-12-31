@@ -130,7 +130,7 @@ app.use((err, req, res, next) => {
                         const countdownElement = document.getElementById('countdown');
                         countdownElement.textContent = countdown;
                         if (countdown <= 0) {
-                            window.location.href = '/users/login';  // redirect to login page
+                            window.location.href = '` + ORIGIN_URL + `/users/login';  // redirect to login page
                         } else {
                             countdown--;
                             setTimeout(updateCountdown, 1000);      // update every second
