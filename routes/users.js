@@ -34,38 +34,6 @@ router.get('/register', function (req, res, next) {
     });
 })    
 
-router.post('/registered', validateAndSanitiseUsers, function (req, res, next) {
-    let loggedInStatus = getLoggedInUser(req)
-    // check if validation errors and if yes then re-display page with old data and error messages
-    if (req.validationErrors) {
-        // debug to test data is there
-        // res.json({ success: false, previousData: req.body, messages: req.validationErrors });
-        // if there are errors then send the old data and the messages to the form
-        // so they can be displayed
-        return res.render('register.ejs', {
-            loggedInStatus,
-            previousData: req.body,
-            messages: req.validationErrors,
-            crsfToken: req.csrfToken()                      // csrf token
-        });
-    }
-    else {
-        const type = "customer"
-        // hash the pssword
-        bcrypt.hash(req.body.password, saltRounds, function(err, hashedPassword) {
-            // store hashed password in your database.
-            let sqlquery = "INSERT INTO users (type, pwhash, email) VALUES (?,?,?)"
-            let newrecord = [type, hashedPassword, req.body.email]
-            db.query(sqlquery, newrecord, (err, result) => {
-                if (err) {
-                    next(err)
-                }
-                else res.redirect(ORIGIN_URL+"/")
-            })
-        })   
-    }                                                                    
-})
-
 router.get('/list',redirectLogin, function(req, res, next) {
     if (req.session.userType == 'admin') {
         let sqlquery = "SELECT * FROM users" // query database to get all the users
@@ -88,54 +56,82 @@ router.get('/login', function(req, res, next) {
 })
 
 router.post('/loggedin', loginRateLimiter, function(req, res, next) {
-    // extracts the password & email field from the data 
-    const plainPassword = req.sanitize(req.body.password)
-    const email = req.sanitize(req.body.email)
+    const plainPassword = req.body.password;  // don't sanitize plain text password
+    const email = req.sanitize(req.body.email);
+    const userInstruction = "Login details are incorrect, please try again";
 
-    // set the instructions for when theres an incorect login details
-    const userInstruction = "Login details are incorrect, please try again"
+    // 500 error casued by the mysql timing out if the system had not been
+    // used for a long time, so in tests everything worked fine 
+    // but if the system was left unused, for a long time, then the db connection would give
+    // this error  
+    // Error: Can't add new command when connection is in closed state at Connection._addCommandClosedState 
+    // and the app was not able to perform any db queries and so was not working
+    // (even though the psages still displayed)
+    // research into this shows I should be using connection pooling which is
+    // is more efficient for a multi-user system and has mechanisms to reconnect
+    // but it is too late to re-implement connection pooling and re-test
+    // the /users/loggedin url
+    // and the /users/registered url 
+    // are the places that this error occurs in my testing this is because
+    // if the system has been not used for a long time any user sessions will 
+    // have expired OR the user will try to register. these are the only two 
+    // points when a database query is executed after inactivity
+    // so this is a workaround to check the db connection. and if disconnected
+    // re-connect before executing the query.
+    // testing to prove normal functionality is simple - testing that this 
+    // works when the database is inactive takes more than 15 hours of waiting
+    function executeQuery() {
+        let sqlquery = "SELECT * FROM users WHERE email= ?";
 
-    // gets the user infomation from the database
-    let sqlquery = "SELECT * FROM users WHERE email= ? "
-
-    // execute sql query
-    db.query(sqlquery, email,(err, dbresult) => {
-        if (err) {  
-            // if sql command is incorect/databse isnt connected
-            console.error("logged in: sql to get password failed")
-            next(err)
-        }
-        // check if no results from the sql - this means this user doesn't exist
-        else if (dbresult == null || dbresult.length === 0) {
-            console.error("logged in: user not found in database")
-            let loggedInStatus = getLoggedInUser(req)
-            res.render('login.ejs', {userInstruction, loggedInStatus})   
-        }
-        else { 
-            req.session.userType = dbresult[0].type;
-            // dbresult[0].pwhash gets the first row in the dbresult (incase there are 2 users with the same email)
-            bcrypt.compare(plainPassword, dbresult[0].pwhash, function(err, result) { 
-                if (err) {
-                    console.error("logged in: compare of passwords failed")
-                    next(err)
-                }
-                else if (result == true) {
-                    // Save user session here, when login is successful
-                    req.session.userEmail = dbresult[0].email;
-                    req.session.userId = dbresult[0].id;
-                    req.session.userType = dbresult[0].type;
-                    let loggedInStatus = getLoggedInUser(req)
-                    res.render('index.ejs', {loggedInStatus})  
-                    console.log("logged in: user: " + req.session.userEmail)
-                }
-                else {
-                    let loggedInStatus = getLoggedInUser(req)
-                    res.render('login.ejs', {userInstruction, loggedInStatus, crsfToken: req.csrfToken()})  
-                }
-            })
-        }
-    })
-})
+        db.query(sqlquery, email, (err, dbresult) => {
+            if (err) {
+                console.error("logged in: sql to get password failed");
+                next(err); 
+            } else if (dbresult == null || dbresult.length === 0) {
+                console.error("logged in: user not found in database");
+                let loggedInStatus = getLoggedInUser(req);
+                res.render('login.ejs', { userInstruction, loggedInStatus });
+            } else {
+                req.session.userType = dbresult[0].type;
+                bcrypt.compare(plainPassword, dbresult[0].pwhash, function(err, result) {
+                    if (err) {
+                        console.error("logged in: compare of passwords failed");
+                        next(err);
+                    } else if (result == true) {
+                        req.session.userEmail = dbresult[0].email;
+                        req.session.userId = dbresult[0].id;
+                        req.session.userType = dbresult[0].type;
+                        let loggedInStatus = getLoggedInUser(req);
+                        res.render('index.ejs', { loggedInStatus });
+                        console.log("logged in: user: " + req.session.userEmail);
+                    } else {
+                        let loggedInStatus = getLoggedInUser(req);
+                        res.render('login.ejs', {
+                            userInstruction,
+                            loggedInStatus,
+                            crsfToken: req.csrfToken(),
+                        });
+                    }
+                });
+            }
+        });
+    }
+    // check if the database connection is disconnected, and reconnect if needed
+    if (!db || db.state === 'disconnected') {
+        console.error('Database connection is disconnected. Trying to reconnect...');
+        db.connect((err) => {
+            if (err) {
+                console.error('Database reconnection failed:', err);
+                next(err); 
+            } else {
+                console.log('Database reconnected.');
+                executeQuery();  // execute query and business logic 
+            }
+        });
+    } else {
+        executeQuery(); // execute query and business logic
+    }
+});
 router.get('/logout', redirectLogin, (req,res) => {
     req.session.destroy(err => {
         if (err) {
@@ -143,6 +139,59 @@ router.get('/logout', redirectLogin, (req,res) => {
         }
         res.redirect(ORIGIN_URL+"/") // redirect to the home page with the links on it
     })
+})
+
+router.post('/registered', validateAndSanitiseUsers, function (req, res, next) {
+    let loggedInStatus = getLoggedInUser(req)
+    // check if validation errors and if yes then re-display page with old data and error messages
+    if (req.validationErrors) {
+        // debug to test data is there
+        // res.json({ success: false, previousData: req.body, messages: req.validationErrors });
+        // if there are errors then send the old data and the messages to the form
+        // so they can be displayed
+        return res.render('register.ejs', {
+            loggedInStatus,
+            previousData: req.body,
+            messages: req.validationErrors,
+            crsfToken: req.csrfToken()                      // csrf token
+        });
+    }
+    else {
+        const type = "customer"
+        // separate out the register query and hash generation
+        // so it can be called later after checking the database connection
+        // see loggedin (which also uses this)
+        function executeRegisterQuery() {
+            // hash the pssword
+            bcrypt.hash(req.body.password, saltRounds, function(err, hashedPassword) {
+                // store hashed password in your database.
+                let sqlquery = "INSERT INTO users (type, pwhash, email) VALUES (?,?,?)"
+                let newrecord = [type, hashedPassword, req.body.email]
+                db.query(sqlquery, newrecord, (err, result) => {
+                    if (err) {
+                        next(err)
+                    }
+                    else res.redirect(ORIGIN_URL+"/")
+                })
+            })   
+        }
+        // check if database is disconnected, if it is execute the registration code,
+        // else connect to the database before executing the code
+        if (!db || db.state === 'disconnected') {
+            console.error('Database connection is closed. Trying to reconnect...');
+            db.connect((err) => {
+                if (err) {
+                    console.error('Database reconnection failed:', err);
+                    next(err); 
+                } else {
+                    console.log('Database reconnected');
+                    executeRegisterQuery(); 
+                }
+            });
+        } else {
+            executeRegisterQuery(); 
+        }                                                                    
+    }
 })
 
 // Export the router object so index.js can access it
