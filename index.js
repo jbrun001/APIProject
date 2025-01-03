@@ -51,7 +51,6 @@ app.use(session({
     }
 }))
 
-
 console.log(`Domain: ${cookieDomain} Path: ${cookiePath}`)
 // Security.  Disable this header to make it harder for attackers to know what technology is being used
 app.disable('x-powered-by')   
@@ -70,29 +69,39 @@ console.log("Using Database. Host: " +process.env.LOCAL_HOST + ",  Database: " +
 global.db = db
 
 // reconnection logic with retry in case connection is lost because of inactivity
-// this listens for any errors from db and reconnects if there are any, it's attached to db later in the code
+// this listens for any errors from db and reconnects if there are any
 // references:  https://github.com/mysqljs/mysql/issues/375, 
 //              https://codingtechroom.com/question/troubleshooting-mysql-auto-reconnect-issues-in-node-js-applications
-function handleDisconnect(db, retries, delay) {
+
+const disconnect_retries = 6                            // how many attempts to reconnect after a disconnection is detected
+const disconnect_retry_delay = 3000                     // how many ms to wait before trying to re-connect
+// changes start
+
+function handleDisconnect(db) {
+    let state = {retries: disconnect_retries} 
     db.on('error', function (err) {
         console.error('Database error:', err)
-        if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.message.includes('The client was disconnected')) {
-            if (retries > 0) {
-                console.log(`Reconnecting... Attempts left: ${retries}`)
+        // check for all disconnection type codes plus error text (windows: 'The client was disconnected')
+        // but this differs based on platform and versions of node, mysql
+        if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === "ECONNRESET" || err.code === "ETIMEDOUT" || err.message.toLowerCase().includes("lost") || err.message.toLowerCase().includes("closed") || err.message.toLowerCase().includes('the client was disconnected')) {
+            if (state.retries > 0) {
+                console.log(`Reconnecting... Attempts left: ${state.retries}`)
                 db.destroy()
                 const newConnection = mysql.createConnection(db.config)
-                handleDisconnect(newConnection, retries - 1, delay)      // recursively call listening to the new connection
+                handleDisconnect(newConnection)      // recursively call listening to the new connection
                 global.db = newConnection                                // assingn new connection to global.db so no change to route code
                 // manage connect retries
                 setTimeout(() => {
                     newConnection.connect((err) => {
                         if (err) {
                             console.error('Reconnection failed:', err)
+                            state.retries--
                         } else {
                             console.log('Reconnected to database.')
+                            state.retries = disconnect_retries                // we have reconnected so re-set this so next time we get the same number of reconnection tries 
                         }
                     })
-                }, delay)
+                }, disconnect_retry_delay)
             } else {
                 console.error('Max reconnection attempts reached.')
                 throw err
@@ -113,7 +122,7 @@ db.connect((err) => {
 });
 
 // listen for errors from db on the initial connection, 6 re-trys 5s apart
-handleDisconnect(db, 6, 5000)
+handleDisconnect(db)
 
 // Define our application-specific data
 app.locals.appData = {appName: "Fund Tracker"}
