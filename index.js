@@ -60,22 +60,60 @@ app.disable('x-powered-by')
 // the .env file has these settings - so they are not stored in the source on github
 let db;
 db = mysql.createConnection ({
-  host: process.env.LOCAL_HOST,
-  user: process.env.LOCAL_USER,
-  password: process.env.LOCAL_PASSWORD,
-  database: process.env.LOCAL_DATABASE
+    host: process.env.LOCAL_HOST,
+    user: process.env.LOCAL_USER,
+    password: process.env.LOCAL_PASSWORD,
+    database: process.env.LOCAL_DATABASE
 });
 console.log("Using Database. Host: " +process.env.LOCAL_HOST + ",  Database: " + process.env.LOCAL_DATABASE);
-db.connect();
 
-// Connect to the database
+global.db = db
+
+// reconnection logic with retry in case connection is lost because of inactivity
+// this listens for any errors from db and reconnects if there are any, it's attached to db later in the code
+// references:  https://github.com/mysqljs/mysql/issues/375, 
+//              https://codingtechroom.com/question/troubleshooting-mysql-auto-reconnect-issues-in-node-js-applications
+function handleDisconnect(db, retries, delay) {
+    db.on('error', function (err) {
+        console.error('Database error:', err)
+        if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.message.includes('The client was disconnected')) {
+            if (retries > 0) {
+                console.log(`Reconnecting... Attempts left: ${retries}`)
+                db.destroy()
+                const newConnection = mysql.createConnection(db.config)
+                handleDisconnect(newConnection, retries - 1, delay)      // recursively call listening to the new connection
+                global.db = newConnection                                // assingn new connection to global.db so no change to route code
+                // manage connect retries
+                setTimeout(() => {
+                    newConnection.connect((err) => {
+                        if (err) {
+                            console.error('Reconnection failed:', err)
+                        } else {
+                            console.log('Reconnected to database.')
+                        }
+                    })
+                }, delay)
+            } else {
+                console.error('Max reconnection attempts reached.')
+                throw err
+            }
+        } else {
+            throw err
+        }
+    })
+}
+
+// initial connection to the database
 db.connect((err) => {
     if (err) {
+        console.error('Database connection failed:', err)
         throw err
     }
-    console.log('Connected to database')
-})
-global.db = db
+    console.log('Connected to database.')
+});
+
+// listen for errors from db on the initial connection, 6 re-trys 5s apart
+handleDisconnect(db, 6, 5000)
 
 // Define our application-specific data
 app.locals.appData = {appName: "Fund Tracker"}
@@ -142,7 +180,7 @@ app.use((err, req, res, next) => {
             <body>
                 <h1><span class="material-symbols-outlined">error</span> Session Expired / Invalid CSRF token</h1>
                 <p>Your session has expired.</p>
-                <p>Redirecting to the login page in <span id="countdown">5</span> seconds...</p>
+                <p>Redirecting to the login page in <span id="countdown">1</span> seconds...</p>
                 <p>If you are not redirected, <a href="/users/login">click here</a>.</p>
             </body>
             </html>
