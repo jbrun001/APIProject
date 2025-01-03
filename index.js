@@ -207,8 +207,8 @@ app.use((req, res, next) => {
 // security. custom error so default will not give away we are using express
 app.use((err, req, res, next) => {
   console.error(err.stack)
-  res.status(500).send('An error has occured\n' + err.code + '\n' + err.stack + '\n' + err.message + '\n')
-//  res.status(500).send('An error has occured')
+//  res.status(500).send('An error has occured\n' + err.code + '\n' + err.stack + '\n' + err.message + '\n')
+  res.status(500).send('An error has occured')
 
 })
 
