@@ -78,7 +78,7 @@ router.get('/search-result',validateAndSanitiseFunds,redirectLogin, function (re
     }
     else {
         Promise.all([
-            getFundSearch(search_text, sort_by),                           // Promise.all[0]
+            getFundSearch(search_text, sort_by),                                 // Promise.all[0]
             getUserPortfolios(req.session.userId)                                // Promise.all[1]
         ])
         .then(([getFundSearchResults,getUserPortfolioResults]) => {              // for more query results name them here 1st field is promise.all[0] etc.

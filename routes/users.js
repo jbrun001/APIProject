@@ -79,7 +79,7 @@ router.post('/loggedin', loginRateLimiter, function(req, res, next) {
     // so this is a workaround to check the db connection. and if disconnected
     // re-connect before executing the query.
     // testing to prove normal functionality is simple - testing that this 
-    // works when the database is inactive takes more than 15 hours of waiting
+    // works when the database is inactive takes more than 8 hours of waiting
     function executeQuery() {
         let sqlquery = "SELECT * FROM users WHERE email= ?";
 

@@ -41,18 +41,18 @@ app.use(session({
     secret: process.env.SESSION_SECRET,       // use long session secret and keep in .env so not published on github
     name: process.env.SESSION_NAME,           // use a random session name so it's unpredictable for attackers, and put in .env
     resave: false,
-    saveUninitialized: true,                  // the csrf for the /users views require an aunautheticateed session
+    saveUninitialized: true,                  // the csrf for the /users views require an unautheticateed session otherwise this would be true
     cookie: {
           secure: cookieSecure,               // force https when on live server but not in development
           httpOnly: true,                     // cookie can't be set by javascript
- //         domain: cookieDomain,             // restricts cookie sending to just this domain - had to remove this as was not working on uni server maybe because the domain and path are via apache?
- //         path: cookiePath,                 // restricts cookie sending to just the part of the path that has the routes - had to remove this as was not working on uni server maybe because the domain and path are via apache?
-          expires: 600000                     // 10 mins before re-login is this too short?
+ //         domain: cookieDomain,             // restricts cookie sending to just this domain - had to remove this as was not working on uni server, becsause of the way that localhost is published via apache?
+ //         path: cookiePath,                 // restricts cookie sending to just the part of the path that has the routes - had to remove this as was not working on uni server, because of localhost published via apache?
+          expires: 600000                     // 10 mins before re-login given this is financial information, this is an appropriate length
     }
 }))
 
 console.log(`Domain: ${cookieDomain} Path: ${cookiePath}`)
-// Security.  Disable this header to make it harder for attackers to know what technology is being used
+// Security.  Disable this http header to make it harder for attackers to know what technology is being used
 app.disable('x-powered-by')   
 
 // Define the database connection
@@ -67,28 +67,25 @@ db = mysql.createConnection ({
 console.log("Using Database. Host: " +process.env.LOCAL_HOST + ",  Database: " + process.env.LOCAL_DATABASE);
 
 global.db = db
-
 // reconnection logic with retry in case connection is lost because of inactivity
 // this listens for any errors from db and reconnects if there are any
 // references:  https://github.com/mysqljs/mysql/issues/375, 
 //              https://codingtechroom.com/question/troubleshooting-mysql-auto-reconnect-issues-in-node-js-applications
-
 const disconnect_retries = 6                            // how many attempts to reconnect after a disconnection is detected
 const disconnect_retry_delay = 3000                     // how many ms to wait before trying to re-connect
-// changes start
 
 function handleDisconnect(db) {
-    let state = {retries: disconnect_retries} 
-    db.on('error', function (err) {
+    let state = {retries: disconnect_retries}            
+    db.on('error', function (err) {                     // listen for errors on the db
         console.error('Database error:', err)
         // check for all disconnection type codes plus error text (windows: 'The client was disconnected')
-        // but this differs based on platform and versions of node, mysql
+        // This differs based on platform and versions of node, mysql
         if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === "ECONNRESET" || err.code === "ETIMEDOUT" || err.message.toLowerCase().includes("lost") || err.message.toLowerCase().includes("closed") || err.message.toLowerCase().includes('the client was disconnected')) {
             if (state.retries > 0) {
                 console.log(`Reconnecting... Attempts left: ${state.retries}`)
                 db.destroy()
                 const newConnection = mysql.createConnection(db.config)
-                handleDisconnect(newConnection)      // recursively call listening to the new connection
+                handleDisconnect(newConnection)                          // recursively call listening to the new connection, exit condition is no error
                 global.db = newConnection                                // assingn new connection to global.db so no change to route code
                 // manage connect retries
                 setTimeout(() => {
@@ -121,7 +118,7 @@ db.connect((err) => {
     console.log('Connected to database.')
 });
 
-// listen for errors from db on the initial connection, 6 re-trys 5s apart
+// listen for errors from db on the initial connection
 handleDisconnect(db)
 
 // Define our application-specific data
@@ -158,9 +155,14 @@ app.use('/prices', pricesRoutes)
 const apiRoutes = require('./routes/api')
 app.use('/api', apiRoutes)
 
-// security. if the session has expired then the crsf token will have expired
-// so catch this error if it happens - otherwise it will just look like
-// an internal server error
+// security. if the user is posting a form that has a cross site request forgery
+// token in it and that is not valid (session has expired / they are using a page
+// that has been loaded a long time ago / they are attempting a cross site request
+// forgery) there is an error that is generated (and the post fails)
+// so catch this error if it happens, and re-direct the user to the login page
+// which will be the correct next action. If this is not here a 500 error would be 
+// produced.
+// left this custom error page implemented here to demonstrate CSRF invalid tokens being handled 
 app.use((err, req, res, next) => {
   if (err.code === 'EBADCSRFTOKEN') {
       res.status(403).send(`
@@ -170,9 +172,9 @@ app.use((err, req, res, next) => {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">        
                 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined">                <title>Session Expired</title>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined">                <title>Expired CSRF</title>
                 <script>
-                    let countdown = 4;                              // starting countdown timer value
+                    let countdown = 2;                              // starting countdown timer value
                     function updateCountdown() {
                         const countdownElement = document.getElementById('countdown');
                         countdownElement.textContent = countdown;
@@ -187,9 +189,9 @@ app.use((err, req, res, next) => {
                 </script>
             </head>
             <body>
-                <h1><span class="material-symbols-outlined">error</span> Session Expired / Invalid CSRF token</h1>
-                <p>Your session has expired.</p>
-                <p>Redirecting to the login page in <span id="countdown">1</span> seconds...</p>
+                <h1><span class="material-symbols-outlined">error</span> Invalid CSRF token</h1>
+                <p>The CSRF token has expired.</p>
+                <p>Redirecting to the login page in <span id="countdown">2</span> seconds...</p>
                 <p>If you are not redirected, <a href="/users/login">click here</a>.</p>
             </body>
             </html>
