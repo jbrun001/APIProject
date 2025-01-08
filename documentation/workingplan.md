@@ -119,8 +119,8 @@ sample data from justetf
 
 
 
-## Data Model [100]
-`A data model including a diagram and description (max 100 words)`
+## draft Data Model
+
 ```mermaid
 ---
 config:
