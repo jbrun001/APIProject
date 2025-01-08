@@ -3,7 +3,7 @@
 
 gantt
     dateFormat  YYYY-MM-DD
-    title       Databases & the Web Individual Project Plan
+    title      Fund Tracker working project plan
     excludes    sunday
     %% (`excludes` accepts specific dates in YYYY-MM-DD format, days of the week ("sunday") or "weekends", but not the word "weekdays".)
 
