@@ -192,4 +192,4 @@ Security checklist
 - [X] SQL Injection attacks – sanitisation
 - [X] Cross Site Scripting – sanitisation
 - [X] Cross Site Request Forgery
-- [ ] Rate limiting for pages as well
+- [X] Rate limiting for pages as well
