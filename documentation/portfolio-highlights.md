@@ -24,6 +24,8 @@ A fund portfolio management app, updating prices using a public REST API, and pr
 - **CSRF Defense** - Cross-site request forgery protection.  
 - **Material Design** - UI framework implementation.  
 - **Promises** - more complex use of promises for multiple SQL calls
+- **Plant UML** - [Project Plans](https://github.com/jbrun001/APIProject/blob/main/documentation/plan.png) from [text files](https://github.com/jbrun001/APIProject/blob/main/documentation/plan.puml)
+- **Mermaid** - simple class diagrams, ERD, flowcharts which get rendered in markdown on github automatically [which I found useful for working notes](https://github.com/jbrun001/APIProject/blob/main/documentation/workingplan.md)
   
 ---
 [Return to my portfolio](https://jbrun001.github.io/allprojects.html)
