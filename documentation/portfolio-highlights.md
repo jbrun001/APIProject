@@ -5,7 +5,7 @@
 **Platform:** Browser Based  
 **Team/Solo:** Solo Project
 
-**Repository:** [(https://github.com/jbrun001/APIProject](https://github.com/jbrun001/APIProject)
+**Repository:** [https://github.com/jbrun001/APIProject](https://github.com/jbrun001/APIProject)
 
 ---
 
