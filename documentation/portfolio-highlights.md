@@ -26,3 +26,5 @@ A fund portfolio management app, updating prices using a public REST API, and pr
 - **Promises** - more complex use of promises for multiple SQL calls
   
 ---
+[Return to my portfolio](https://jbrun001.github.io/allprojects.html)
+---
