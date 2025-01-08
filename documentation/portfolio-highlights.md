@@ -4,6 +4,7 @@
 **Timeline:** 2024  
 **Platform:** Browser Based  
 **Team/Solo:** Solo Project
+**Repository:** [(https://github.com/jbrun001/APIProject](https://github.com/jbrun001/APIProject)
 
 ---
 
@@ -21,5 +22,6 @@ A fund portfolio management app, updating prices using a public REST API, and pr
 - **Rate Limiting** - Traffic management and security.  
 - **CSRF Defense** - Cross-site request forgery protection.  
 - **Material Design** - UI framework implementation.  
-
+- **Promises** - more complex use of promises for multiple SQL calls
+  
 ---
