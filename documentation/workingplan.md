@@ -115,28 +115,9 @@ sample data from justetf
 5   IE00BK5LYT47  0.0005  2.30   MXUD   https://finance.yahoo.com/quote/MXUD.L/             Yes     Yes
 ```
 
-
-## yahoo finance, using a rapid api key
-
-
 ## alphaville using an API key that allows 25 queries a day
 
 
-# Draft Documentation
-## Outline [200 words max]
-`An outline describing the application you have built (max 200 words)
-`
-
-My application is a stock portfolio reporting system.
-
-## Links and Logins
-`Links and logins: URL of your deployed, running app; Link to your Github repo; Username / password`
-
-## Architecture [100 max] [actual 92 words]
-`A high-level architecture including a diagram and description (max 100 words) describing what technologies and components you have used in your application tier and data tier`
-The application is a Node.js application, hosted on the Goldsmiths servers. Registered and Public Users interact via HTTPS requests routed through an Apache Web Server, which forwards them to the Node.js Application Layer. The application comprises Routing (Express), Middleware (e.g., express-session, express-validator, express-rate-limit), Controllers for business logic, and Views (EJS) for rendering templates. It handles public API requests, and calls the AlphaVantage public API to obtain fund price data. MySQL is used to store data. dotenv manages environment configuration for loading of sensitive data like API keys, session details and database credentials.
-
-plantUML: architecturediagram.puml
 
 ## Data Model [100]
 `A data model including a diagram and description (max 100 words)`
@@ -204,30 +185,11 @@ erDiagram
     portfolios }|--o| users : "on user_id"
 
 ```
-
-
-
-## User Functionality [500 words max]
-`A description of the user-facing functionality of your application, adding screenshots to help explain (max 500 words)`
-
-## Security [500 words max]
-`A description of how you have addressed security risks in your application (max 500 words)`
-
 Security checklist
-- [ ] Transport SSL
+- [X] Transport SSL
 - [X] Passwords bcrypt , passwords complexity
-- [ ] API use (api key?), API rate limiting (denial of service?)
+- [X] API use (api key?), API rate limiting (denial of service?)
 - [X] SQL Injection attacks – sanitisation
 - [X] Cross Site Scripting – sanitisation
-- [ ] Cross Site Request Forgery
-- [ ] Content headers - CORS
+- [X] Cross Site Request Forgery
 - [ ] Rate limiting for pages as well
-- [ ] zap test? if time
-
-## API Usage
-`Details of how to use your API`
-
-## API Provision
-## Advanced Techniques [500 words max]
-`An optional description of any advanced techniques that you want us to consider as a demonstration of your development skills.  You must include code snippets to illustrate how you have used these techniques and refer to the files that contain that code. (max 500 words)`
-
